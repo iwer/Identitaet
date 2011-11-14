@@ -21,7 +21,13 @@ typedef struct {
 	float a; 
 } Color;
 
-__kernel void updateParticle(__global Particle3D* pIn, __global Color* cIn ,float floor, int mode) {
+__kernel void updateParticle(__global Particle3D* pIn, 
+                             __global Color* cIn ,
+                             float floor, 
+                             float leftWall, 
+                             float rightWall, 
+                             float backWall, 
+                             int mode) {
     // Global work-item ID value
     int id = get_global_id(0);
     // Particle at index id
@@ -30,6 +36,24 @@ __kernel void updateParticle(__global Particle3D* pIn, __global Color* cIn ,floa
     
     float diffSpeedY = GRAVITY * DELTATIME;
     if(mode == MODE_GRAVITY){
+        // leftWall contact
+        // rightWall contact
+        if (((pin->x) + (pin->velX) > rightWall) ||
+            ((pin->x) + (pin->velX) < leftWall)) {
+            pin->velX = -(pin->velX);
+        }
+
+
+
+        // frontWall contact
+        // backWall contact
+        if (((pin->z) + (pin->velZ) > backWall) ||
+            ((pin->z) + (pin->velZ) < 0)) {
+            pin->velZ = -(pin->velZ);
+        }
+        
+        
+        
         // floor contact
         if((pin->y) + (pin->velY) < floor) {
             pin->velX = (pin->velX) * 0.8f;
@@ -48,7 +72,7 @@ __kernel void updateParticle(__global Particle3D* pIn, __global Color* cIn ,floa
                 cin->a = (cin->a) - 0.0025f;
             }
         } else {
-            // movement
+            // straight movement
             pin->x = (pin->x) + pin->velX;
             pin->y = (pin->y) + pin->velY;
             pin->z = (pin->z) + pin->velZ;

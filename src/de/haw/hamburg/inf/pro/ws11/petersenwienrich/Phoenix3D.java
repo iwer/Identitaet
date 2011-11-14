@@ -24,10 +24,10 @@ public class Phoenix3D extends PApplet {
     private static final long serialVersionUID = 1L;
 
     // ParticleConstants
-    private int NUM_PARTICLES = 1024 * 256;
-    private int PARTICLE_NFLOAT = 8;
-    private int PARTICLEFLOATSIZE = NUM_PARTICLES * PARTICLE_NFLOAT;
-    private int PARTICLEBYTESIZE = PARTICLEFLOATSIZE * 4;
+    private final int NUM_PARTICLES = 1024 * 256;
+    private final int PARTICLE_NFLOAT = 8;
+    private final int PARTICLEFLOATSIZE = NUM_PARTICLES * PARTICLE_NFLOAT;
+    private final int PARTICLEBYTESIZE = PARTICLEFLOATSIZE * 4;
 
     // Modes
     private static final int MODE_STATIC = 0;
@@ -49,7 +49,7 @@ public class Phoenix3D extends PApplet {
     private OpenCLKernel kernel;
 
     // FrameCounter
-    private FrequencyCounter fps = new FrequencyCounter();
+    private final FrequencyCounter fps = new FrequencyCounter();
 
     // Particle Buffers
     private Particle3D[] p;
@@ -88,9 +88,13 @@ public class Phoenix3D extends PApplet {
     long time;
 
     private float floorLevel;
+    private float leftWall;
+    private float rightWall;
+    private float backWall;
 
-    private int xSize = 500;
+    private final int xSize = 500;
 
+    @Override
     public void setup() {
 
         // SimpleOpenNI Setup
@@ -101,7 +105,7 @@ public class Phoenix3D extends PApplet {
         ni.enableUser(SimpleOpenNI.SKEL_PROFILE_NONE);
         // ni.enableScene();
         ni.enableRGB(ni.depthWidth(), ni.depthHeight(), 30);
-        ni.alternativeViewPointDepthToImage();
+        // ni.alternativeViewPointDepthToImage();
         time = millis() - time;
         System.out.println("SimpleOpenNI Setup time: " + time + " ms");
 
@@ -113,6 +117,9 @@ public class Phoenix3D extends PApplet {
         System.out.println("Processing Setup time: " + time + " ms");
 
         floorLevel = -(height + 500);
+        leftWall = -2000;
+        rightWall = 2000;
+        backWall = 4000;
 
         // initialize GL object
         time = millis();
@@ -237,14 +244,18 @@ public class Phoenix3D extends PApplet {
         kernel.setArg(0, clMemParticles.getCLMem());
         kernel.setArg(1, clMemColors.getCLMem());
         kernel.setArg(2, floorLevel);
-        kernel.setArg(3, MODE_GRAVITY);
+        kernel.setArg(3, leftWall);
+        kernel.setArg(4, rightWall);
+        kernel.setArg(5, backWall);
+        kernel.setArg(6, mode);
 
-        gl.glPointSize(6);
+        gl.glPointSize(3);
         pgl.endGL();
         perspective(95, width / height, 10, 150000);
 
     }
 
+    @Override
     public void draw() {
         PGraphicsOpenGL pgl = (PGraphicsOpenGL) g;
         ni.update();
@@ -253,7 +264,7 @@ public class Phoenix3D extends PApplet {
         // set the scene pos
         translate(width / 2, height / 2, 0);
         // rotX = radians(180) + radians(sin(2 * tick));
-        rotY = radians(0) + 10 * radians(cos(tick / 2));
+        // rotY = radians(0) + 10 * radians(cos(tick / 2));
         rotateX(rotX);
         rotateY(rotY);
         scale(zoomF);
@@ -296,10 +307,10 @@ public class Phoenix3D extends PApplet {
                         // realWorldPoint.y + random(-2, 2), realWorldPoint.z
                         // + random(-2, 2));
                         // gl.glColor3f(255, 255, 255);
-                        // gl.glColor3f(norm(random(255), 0, 255),
-                        // norm(random(255), 0, 255), norm(random(255), 0,
-                        // 255));
-                        gl.glColor3f(norm(red(img.get(x, y)), 0, 255), norm(green(img.get(x, y)), 0, 255), norm(blue(img.get(x, y)), 0, 255));
+                        gl.glColor3f(norm(random(255), 0, 255), norm(random(255), 0, 255), norm(random(255), 0, 255));
+                        // gl.glColor3f(norm(red(img.get(x, y - 50)), 0, 255),
+                        // norm(green(img.get(x, y - 50)), 0, 255),
+                        // norm(blue(img.get(x, y - 50)), 0, 255));
                         // gl.glColor3f(1.0f, 0, 0);
                         gl.glVertex3f(realWorldPoint.x, realWorldPoint.y, realWorldPoint.z);
                     }
@@ -318,7 +329,8 @@ public class Phoenix3D extends PApplet {
                         int y = (i - x) / ni.depthHeight();
                         // check if there is a user
                         if (userMap[i] != 0) {
-                            createGravityParticle(realWorldPoint.x + random(-2, 2), realWorldPoint.y + random(-2, 2), realWorldPoint.z + random(-2, 2), x, y);
+                            createGravityParticle(realWorldPoint.x + random(-2, 2), realWorldPoint.y + random(-2, 2), realWorldPoint.z
+                                    + random(-2, 2), x, y);
                         }
                     }
                 }
@@ -330,27 +342,43 @@ public class Phoenix3D extends PApplet {
         }
         lastPart = count;
 
-        drawFloor();
+        drawRoom();
         if (mode == MODE_GRAVITY) {
+            Update(firstPart, lastPart);
+        } else {
             Update(firstPart, lastPart);
         }
         Render();
         System.out.println("FPS:" + fps.getFrequency());
     }
 
-    public void drawFloor() {
+    public void drawRoom() {
         pgl.beginGL();
-        gl.glBegin(GL.GL_POLYGON);
+
+        gl.glBegin(GL.GL_LINE_LOOP);
         gl.glColor3f(0, 0, 0);
         gl.glTexCoord2f(0, 0);
-        gl.glVertex3f(-xSize * 2.0f, floorLevel + .5f, -xSize * 2.0f);
+        gl.glVertex3f(leftWall, floorLevel + .5f, 0);
         gl.glTexCoord2f(1, 0);
-        gl.glVertex3f(xSize * 2.0f, floorLevel + .5f, -xSize * 2.0f);
+        gl.glVertex3f(rightWall, floorLevel + .5f, 0);
         gl.glTexCoord2f(1, 1);
-        gl.glVertex3f(xSize * 2.0f, floorLevel + .5f, xSize * 2.0f);
+        gl.glVertex3f(rightWall, floorLevel + .5f, backWall);
         gl.glTexCoord2f(0, 1);
-        gl.glVertex3f(-xSize * 2.0f, floorLevel + .5f, xSize * 2.0f);
+        gl.glVertex3f(leftWall, floorLevel + .5f, backWall);
         gl.glEnd();
+
+        gl.glBegin(GL.GL_LINES);
+        gl.glColor3f(0, 0, 0);
+        gl.glVertex3f(leftWall, floorLevel + .5f, 0);
+        gl.glVertex3f(leftWall, 2000, 0);
+        gl.glVertex3f(leftWall, floorLevel + .5f, backWall);
+        gl.glVertex3f(leftWall, 2000, backWall);
+        gl.glVertex3f(rightWall, floorLevel + .5f, 0);
+        gl.glVertex3f(rightWall, 2000, 0);
+        gl.glVertex3f(rightWall, floorLevel + .5f, backWall);
+        gl.glVertex3f(rightWall, 2000, backWall);
+        gl.glEnd();
+
         pgl.endGL();
     }
 
@@ -358,18 +386,18 @@ public class Phoenix3D extends PApplet {
         float inverseX = x;
         float inverseY = y;
         float inverseZ = z;
-        // System.out.println("inverseX: " + inverseX + "; inverseY: " +
-        // inverseY + "; inverseZ: " + inverseZ);
+
+        if (z <= 10) {
+            return;
+        }
 
         if (count >= NUM_PARTICLES) {
             count = 0;
         }
-        // p[count] = new ParticlePack(inverseX, inverseY, 0);
-        if (x != 0 || y != 0 || z != 0) {
-            p[count].x = inverseX + random(-1.0f, 1.0f);
-            p[count].y = inverseY + random(-1.0f, 1.0f);
-            p[count].z = inverseZ + random(-1.0f, 1.0f);
-        }
+
+        p[count].x = inverseX + random(-1.0f, 1.0f);
+        p[count].y = inverseY + random(-1.0f, 1.0f);
+        p[count].z = inverseZ + random(-1.0f, 1.0f);
 
         if (gravityMode == MODE_GRAVITY_FALLING) {
             // falling mode
@@ -385,9 +413,8 @@ public class Phoenix3D extends PApplet {
             p[count].velZ = 50 * sin(a) * sin(b);
         }
 
-        color[count] = color(img.get((int) realX, (int) realY));
-        // color[count] = color(random(255), random(255), random(255),
-        // random(255));
+        // color[count] = color(img.get(realX, realY));
+        color[count] = color(random(255), random(255), random(255), random(255));
         // color[count] = color(255);
 
         colorBuffer.put(count * 4 + 0, norm(red(color[count]), 0, 255));
@@ -492,7 +519,10 @@ public class Phoenix3D extends PApplet {
             kernel.setArg(0, clMemParticles.getCLMem());
             kernel.setArg(1, clMemColors.getCLMem());
             kernel.setArg(2, floorLevel);
-            kernel.setArg(3, mode);
+            kernel.setArg(3, leftWall);
+            kernel.setArg(4, rightWall);
+            kernel.setArg(5, backWall);
+            kernel.setArg(6, mode);
 
             kernel.run1D(NUM_PARTICLES, (int) wgs);
         } catch (Throwable ex) {
@@ -510,12 +540,14 @@ public class Phoenix3D extends PApplet {
 
     // Keyboard events
 
+    @Override
     public void mousePressed() {
         mode = (mode + 1) % NMODES;
         run = 0;
         // System.out.println("Mode: " + mode);
     }
 
+    @Override
     public void keyPressed() {
         switch (key) {
         case ' ':
