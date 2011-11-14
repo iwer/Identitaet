@@ -32,11 +32,13 @@ public class Phoenix3D extends PApplet {
     // Modes
     private static final int MODE_STATIC = 0;
     private static final int MODE_GRAVITY = 1;
-    private static final int MODE_GRAVITY_FALLING = 2;
-    private static final int MODE_GRAVITY_EXPLODE = 3;
-    private static final int NMODES = 2;
+    private static final int MODE_WEIGHTLESS = 2;
+    private static final int NMODES = 3;
 
     private int mode = MODE_STATIC;
+
+    private static final int MODE_GRAVITY_FALLING = 102;
+    private static final int MODE_GRAVITY_EXPLODE = 103;
     private int gravityMode = MODE_GRAVITY_FALLING;
 
     // Ressources Location
@@ -319,7 +321,7 @@ public class Phoenix3D extends PApplet {
                 pgl.endGL();
             }
 
-        } else if (mode == MODE_GRAVITY) {
+        } else if (mode == MODE_GRAVITY || mode == MODE_WEIGHTLESS) {
             // #############################
             if (userMap != null) {
                 if (run <= 1) {
@@ -399,7 +401,11 @@ public class Phoenix3D extends PApplet {
         p[count].y = inverseY + random(-1.0f, 1.0f);
         p[count].z = inverseZ + random(-1.0f, 1.0f);
 
-        if (gravityMode == MODE_GRAVITY_FALLING) {
+        if (mode == MODE_WEIGHTLESS) {
+            p[count].velX = random(-3.0f, 3.0f);
+            p[count].velY = random(-3.0f, 3.0f);
+            p[count].velZ = random(-3.0f, 3.0f);
+        } else if (gravityMode == MODE_GRAVITY_FALLING) {
             // falling mode
             p[count].velX = random(-1.0f, 1.0f);
             p[count].velY = random(-1.0f, 1.0f);
