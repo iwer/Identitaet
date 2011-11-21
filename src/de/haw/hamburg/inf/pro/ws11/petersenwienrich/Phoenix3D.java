@@ -97,10 +97,13 @@ public class Phoenix3D extends PApplet {
     private float leftWall;
     private float rightWall;
     private float backWall;
+    private float backGroundWall;
 
     private int moveBackCounter;
 
     private final int[] texture = new int[1];
+
+    private final boolean brutal = true;
 
     @Override
     public void setup() {
@@ -127,7 +130,8 @@ public class Phoenix3D extends PApplet {
         floorLevel = -(height + 500);
         leftWall = -3000;
         rightWall = 3000;
-        backWall = 4000;
+        backWall = 5000;
+        backGroundWall = 4000;
 
         backgroundImg = loadImage(IMG_RESSOURCE + "background.jpg");
         int tc = backgroundImg.pixels[0];
@@ -381,13 +385,13 @@ public class Phoenix3D extends PApplet {
 
         gl.glBegin(GL.GL_QUADS);
         gl.glTexCoord2f(0f, 0f);
-        gl.glVertex3f(-(backgroundImg.width * 3), (backgroundImg.height * 3), backWall);
+        gl.glVertex3f(-(backgroundImg.width * 3), (backgroundImg.height * 3), backGroundWall);
         gl.glTexCoord2f(1f, 0f);
-        gl.glVertex3f((backgroundImg.width * 3), (backgroundImg.height * 3), backWall);
+        gl.glVertex3f((backgroundImg.width * 3), (backgroundImg.height * 3), backGroundWall);
         gl.glTexCoord2f(1f, 1f);
-        gl.glVertex3f((backgroundImg.width * 3), -(backgroundImg.height * 3), backWall);
+        gl.glVertex3f((backgroundImg.width * 3), -(backgroundImg.height * 3), backGroundWall);
         gl.glTexCoord2f(0f, 1f);
-        gl.glVertex3f(-(backgroundImg.width * 3), -(backgroundImg.height * 3), backWall);
+        gl.glVertex3f(-(backgroundImg.width * 3), -(backgroundImg.height * 3), backGroundWall);
 
         gl.glEnd();
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
@@ -426,24 +430,30 @@ public class Phoenix3D extends PApplet {
     }
 
     public void createWeightlessParticle(float x, float y, float z, int realX, int realY) {
+        createWeightlessParticle(x, y, z, realX, realY, tmpParticleNumber);
+    }
+
+    public void createWeightlessParticle(float x, float y, float z, int realX, int realY, int particleNumber) {
         if (z <= 10) {
             return;
         }
 
-        if (tmpParticleNumber >= NUM_PARTICLES) {
-            tmpParticleNumber = 0;
+        if (particleNumber >= NUM_PARTICLES) {
+            particleNumber = 0;
         }
-        particle[tmpParticleNumber].x = x + random(-1.0f, 1.0f);
-        particle[tmpParticleNumber].y = y + random(-1.0f, 1.0f);
-        particle[tmpParticleNumber].z = z + random(-1.0f, 1.0f);
+        particle[particleNumber].x = x + random(-1.0f, 1.0f);
+        particle[particleNumber].y = y + random(-1.0f, 1.0f);
+        particle[particleNumber].z = z + random(-1.0f, 1.0f);
 
         if (mayorMode == MODE_WEIGHTLESS) {
             float a = random(0, 180);
             float b = random(0, 360);
-            particle[tmpParticleNumber].velX = 3 * sin(a) * cos(b);
-            particle[tmpParticleNumber].velY = 3 * cos(a);
-            particle[tmpParticleNumber].velZ = 3 * sin(a) * sin(b);
+            particle[particleNumber].velX = 3 * sin(a) * cos(b);
+            particle[particleNumber].velY = 3 * cos(a);
+            particle[particleNumber].velZ = 3 * sin(a) * sin(b);
         }
+
+        paintParticle(realX, realY, particleNumber);
     }
 
     public void createGravityParticle(float x, float y, float z, int realX, int realY) {
@@ -479,17 +489,23 @@ public class Phoenix3D extends PApplet {
             particle[particleNumber].velZ = 50 * sin(a) * sin(b);
         }
 
+        paintParticle(realX, realY, particleNumber);
+
+    }
+
+    private void paintParticle(int realX, int realY, int particleNumber) {
         particleColor[particleNumber] = color(rgbImg.get(realX, realY));
-        // color[count] = color(random(255), random(255), random(255),
+        if (particleNumber % 10 == 0 && brutal && gravityMode == GRAVITY_EXPLODE) {
+            particleColor[particleNumber] = color(255, 0, 0);
+        }
+        // color[particleNumber] = color(random(255), random(255), random(255),
         // random(255));
-        // color[count] = color(255);
+        // color[particleNumber] = color(255);
 
         colorBuffer.put(particleNumber * 4 + 0, norm(red(particleColor[particleNumber]), 0, 255));
         colorBuffer.put(particleNumber * 4 + 1, norm(green(particleColor[particleNumber]), 0, 255));
         colorBuffer.put(particleNumber * 4 + 2, norm(blue(particleColor[particleNumber]), 0, 255));
         colorBuffer.put(particleNumber * 4 + 3, norm(alpha(particleColor[particleNumber]), 0, 255));
-        // colorBuffer.put(count * 4 + 3, norm(127, 0, 255));
-
     }
 
     void Render() {
