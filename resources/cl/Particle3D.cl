@@ -5,6 +5,7 @@
 #define MODE_WEIGHTLESS 2
 #define MODE_NEG_WEIGHTLESS 3
 
+//lustiger kommentar
 typedef struct{
     float x;
     float y;
