@@ -39,7 +39,7 @@ public class Phoenix3D extends PApplet {
 
     private static final int MODE_GRAVITY_FALLING = 102;
     private static final int MODE_GRAVITY_EXPLODE = 103;
-    private int gravityMode = MODE_GRAVITY_FALLING;
+    private int gravityMode = MODE_GRAVITY_EXPLODE;
 
     // Ressources Location
     private static final String RESSOURCE = Config.CL_LOCATION;
@@ -251,7 +251,7 @@ public class Phoenix3D extends PApplet {
         kernel.setArg(5, backWall);
         kernel.setArg(6, mode);
 
-        gl.glPointSize(3);
+        gl.glPointSize(1);
         pgl.endGL();
         perspective(95, width / height, 10, 150000);
 
@@ -284,7 +284,7 @@ public class Phoenix3D extends PApplet {
         int lastPart;
         int firstPart = count;
         if (mode == MODE_STATIC) {
-            background(255);
+            background(0);
             // count = firstPart = 0;
             // #############################
 
@@ -308,8 +308,10 @@ public class Phoenix3D extends PApplet {
                         // point(realWorldPoint.x + random(-2, 2),
                         // realWorldPoint.y + random(-2, 2), realWorldPoint.z
                         // + random(-2, 2));
-                        // gl.glColor3f(255, 255, 255);
-                        gl.glColor3f(norm(random(255), 0, 255), norm(random(255), 0, 255), norm(random(255), 0, 255));
+                        gl.glColor3f(255, 255, 255);
+                        // gl.glColor3f(norm(random(255), 0, 255),
+                        // norm(random(255), 0, 255), norm(random(255), 0,
+                        // 255));
                         // gl.glColor3f(norm(red(img.get(x, y - 50)), 0, 255),
                         // norm(green(img.get(x, y - 50)), 0, 255),
                         // norm(blue(img.get(x, y - 50)), 0, 255));
@@ -339,7 +341,7 @@ public class Phoenix3D extends PApplet {
                 run++;
             }
             // #############################
-            background(255);
+            background(0);
 
         }
         lastPart = count;
@@ -358,7 +360,7 @@ public class Phoenix3D extends PApplet {
         pgl.beginGL();
 
         gl.glBegin(GL.GL_LINE_LOOP);
-        gl.glColor3f(0, 0, 0);
+        gl.glColor3f(255, 255, 255);
         gl.glTexCoord2f(0, 0);
         gl.glVertex3f(leftWall, floorLevel + .5f, 0);
         gl.glTexCoord2f(1, 0);
@@ -370,7 +372,7 @@ public class Phoenix3D extends PApplet {
         gl.glEnd();
 
         gl.glBegin(GL.GL_LINES);
-        gl.glColor3f(0, 0, 0);
+        gl.glColor3f(255, 255, 255);
         gl.glVertex3f(leftWall, floorLevel + .5f, 0);
         gl.glVertex3f(leftWall, 2000, 0);
         gl.glVertex3f(leftWall, floorLevel + .5f, backWall);
@@ -420,8 +422,9 @@ public class Phoenix3D extends PApplet {
         }
 
         // color[count] = color(img.get(realX, realY));
-        color[count] = color(random(255), random(255), random(255), random(255));
-        // color[count] = color(255);
+        // color[count] = color(random(255), random(255), random(255),
+        // random(255));
+        color[count] = color(255);
 
         colorBuffer.put(count * 4 + 0, norm(red(color[count]), 0, 255));
         colorBuffer.put(count * 4 + 1, norm(green(color[count]), 0, 255));
@@ -550,7 +553,7 @@ public class Phoenix3D extends PApplet {
     public void mousePressed() {
         mode = (mode + 1) % NMODES;
         run = 0;
-        // System.out.println("Mode: " + mode);
+        System.out.println("Mode: " + mode);
     }
 
     @Override
