@@ -24,7 +24,7 @@ public class Phoenix3D extends PApplet {
     private static final long serialVersionUID = 1L;
 
     // ParticleConstants
-    private final int NUM_PARTICLES = 1024 * 256;
+    private final int NUM_PARTICLES = 512 * 128; // 1024 * 256;
     private final int PARTICLE_NFLOAT = 8;
     private final int PARTICLEFLOATSIZE = NUM_PARTICLES * PARTICLE_NFLOAT;
     private final int PARTICLEBYTESIZE = PARTICLEFLOATSIZE * 4;
@@ -33,13 +33,14 @@ public class Phoenix3D extends PApplet {
     private static final int MODE_STATIC = 0;
     private static final int MODE_GRAVITY = 1;
     private static final int MODE_WEIGHTLESS = 2;
-    private static final int NMODES = 3;
+    private static final int MODE_NEG_WEIGHTLESS = 3;
+    private static final int NMODES = 4;
 
     private int mode = MODE_STATIC;
 
     private static final int MODE_GRAVITY_FALLING = 102;
     private static final int MODE_GRAVITY_EXPLODE = 103;
-    private int gravityMode = MODE_GRAVITY_FALLING;
+    private int gravityMode = MODE_GRAVITY_EXPLODE;
 
     // Ressources Location
     private static final String RESSOURCE = Config.CL_LOCATION;
@@ -95,6 +96,8 @@ public class Phoenix3D extends PApplet {
     private float backWall;
 
     private final int xSize = 500;
+
+    private int counter;
 
     @Override
     public void setup() {
@@ -251,7 +254,7 @@ public class Phoenix3D extends PApplet {
         kernel.setArg(5, backWall);
         kernel.setArg(6, mode);
 
-        gl.glPointSize(3);
+        gl.glPointSize(5);
         pgl.endGL();
         perspective(95, width / height, 10, 150000);
 
@@ -309,10 +312,10 @@ public class Phoenix3D extends PApplet {
                         // realWorldPoint.y + random(-2, 2), realWorldPoint.z
                         // + random(-2, 2));
                         // gl.glColor3f(255, 255, 255);
-                        gl.glColor3f(norm(random(255), 0, 255), norm(random(255), 0, 255), norm(random(255), 0, 255));
-                        // gl.glColor3f(norm(red(img.get(x, y - 50)), 0, 255),
-                        // norm(green(img.get(x, y - 50)), 0, 255),
-                        // norm(blue(img.get(x, y - 50)), 0, 255));
+                        // gl.glColor3f(norm(random(255), 0, 255),
+                        // norm(random(255), 0, 255), norm(random(255), 0,
+                        // 255));
+                        gl.glColor3f(norm(red(img.get(x, y - 50)), 0, 255), norm(green(img.get(x, y - 50)), 0, 255), norm(blue(img.get(x, y - 50)), 0, 255));
                         // gl.glColor3f(1.0f, 0, 0);
                         gl.glVertex3f(realWorldPoint.x, realWorldPoint.y, realWorldPoint.z);
                     }
@@ -321,7 +324,7 @@ public class Phoenix3D extends PApplet {
                 pgl.endGL();
             }
 
-        } else if (mode == MODE_GRAVITY || mode == MODE_WEIGHTLESS) {
+        } else if (mode == MODE_GRAVITY || mode == MODE_WEIGHTLESS || mode == MODE_NEG_WEIGHTLESS) {
             // #############################
             if (userMap != null) {
                 if (run <= 1) {
@@ -331,8 +334,7 @@ public class Phoenix3D extends PApplet {
                         int y = (i - x) / ni.depthHeight();
                         // check if there is a user
                         if (userMap[i] != 0) {
-                            createGravityParticle(realWorldPoint.x + random(-2, 2), realWorldPoint.y + random(-2, 2), realWorldPoint.z
-                                    + random(-2, 2), x, y);
+                            createGravityParticle(realWorldPoint.x + random(-2, 2), realWorldPoint.y + random(-2, 2), realWorldPoint.z + random(-2, 2), x, y);
                         }
                     }
                 }
@@ -340,7 +342,22 @@ public class Phoenix3D extends PApplet {
             }
             // #############################
             background(255);
-
+            if (mode == MODE_WEIGHTLESS) {
+                if (counter >= 50) {
+                    mode = MODE_NEG_WEIGHTLESS;
+                    counter = 0;
+                } else {
+                    counter++;
+                }
+            } else if (mode == MODE_NEG_WEIGHTLESS) {
+                if (counter >= 10) {
+                    mode = MODE_GRAVITY;
+                    gravityMode = MODE_GRAVITY_FALLING;
+                    counter = 0;
+                } else {
+                    counter++;
+                }
+            }
         }
         lastPart = count;
 
@@ -402,14 +419,18 @@ public class Phoenix3D extends PApplet {
         p[count].z = inverseZ + random(-1.0f, 1.0f);
 
         if (mode == MODE_WEIGHTLESS) {
-            p[count].velX = random(-3.0f, 3.0f);
-            p[count].velY = random(-3.0f, 3.0f);
-            p[count].velZ = random(-3.0f, 3.0f);
+            float a = random(0, 180);
+            float b = random(0, 360);
+            p[count].velX = 3 * sin(a) * cos(b);
+            p[count].velY = 3 * cos(a);
+            p[count].velZ = 3 * sin(a) * sin(b);
         } else if (gravityMode == MODE_GRAVITY_FALLING) {
             // falling mode
-            p[count].velX = random(-1.0f, 1.0f);
-            p[count].velY = random(-1.0f, 1.0f);
-            p[count].velZ = random(-1.0f, 1.0f);
+            float a = random(0, 180);
+            float b = random(0, 360);
+            p[count].velX = sin(a) * cos(b);
+            p[count].velY = cos(a);
+            p[count].velZ = sin(a) * sin(b);
         } else if (gravityMode == MODE_GRAVITY_EXPLODE) {
             // explode mode
             float a = random(0, 180);
@@ -419,8 +440,9 @@ public class Phoenix3D extends PApplet {
             p[count].velZ = 50 * sin(a) * sin(b);
         }
 
-        // color[count] = color(img.get(realX, realY));
-        color[count] = color(random(255), random(255), random(255), random(255));
+        color[count] = color(img.get(realX, realY));
+        // color[count] = color(random(255), random(255), random(255),
+        // random(255));
         // color[count] = color(255);
 
         colorBuffer.put(count * 4 + 0, norm(red(color[count]), 0, 255));
@@ -548,8 +570,23 @@ public class Phoenix3D extends PApplet {
 
     @Override
     public void mousePressed() {
-        mode = (mode + 1) % NMODES;
-        run = 0;
+        if (mode == MODE_STATIC && gravityMode == MODE_GRAVITY_EXPLODE) {
+            mode = MODE_WEIGHTLESS;
+            gravityMode = MODE_GRAVITY_FALLING;
+        } else if (mode == MODE_GRAVITY && gravityMode == MODE_GRAVITY_FALLING) {
+            mode = MODE_STATIC;
+            run = 0;
+        } else if (mode == MODE_STATIC && gravityMode == MODE_GRAVITY_FALLING) {
+            mode = MODE_GRAVITY;
+            gravityMode = MODE_GRAVITY_EXPLODE;
+        } else if (mode == MODE_GRAVITY && gravityMode == MODE_GRAVITY_EXPLODE) {
+            mode = MODE_STATIC;
+            run = 0;
+        }
+        // mode = (mode + 1) % NMODES;
+        // if (mode == MODE_GRAVITY) {
+        //
+        // }
         // System.out.println("Mode: " + mode);
     }
 
