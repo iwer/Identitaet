@@ -287,7 +287,7 @@ public class Phoenix3D extends PApplet {
         int lastPart;
         int firstPart = count;
         if (mode == MODE_STATIC) {
-            background(255);
+            background(0);
             // count = firstPart = 0;
             // #############################
 
@@ -316,6 +316,7 @@ public class Phoenix3D extends PApplet {
                         // norm(random(255), 0, 255), norm(random(255), 0,
                         // 255));
                         gl.glColor3f(norm(red(img.get(x, y - 50)), 0, 255), norm(green(img.get(x, y - 50)), 0, 255), norm(blue(img.get(x, y - 50)), 0, 255));
+
                         // gl.glColor3f(1.0f, 0, 0);
                         gl.glVertex3f(realWorldPoint.x, realWorldPoint.y, realWorldPoint.z);
                     }
@@ -375,7 +376,7 @@ public class Phoenix3D extends PApplet {
         pgl.beginGL();
 
         gl.glBegin(GL.GL_LINE_LOOP);
-        gl.glColor3f(0, 0, 0);
+        gl.glColor3f(255, 255, 255);
         gl.glTexCoord2f(0, 0);
         gl.glVertex3f(leftWall, floorLevel + .5f, 0);
         gl.glTexCoord2f(1, 0);
@@ -387,7 +388,7 @@ public class Phoenix3D extends PApplet {
         gl.glEnd();
 
         gl.glBegin(GL.GL_LINES);
-        gl.glColor3f(0, 0, 0);
+        gl.glColor3f(255, 255, 255);
         gl.glVertex3f(leftWall, floorLevel + .5f, 0);
         gl.glVertex3f(leftWall, 2000, 0);
         gl.glVertex3f(leftWall, floorLevel + .5f, backWall);
