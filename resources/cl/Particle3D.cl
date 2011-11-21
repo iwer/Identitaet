@@ -5,7 +5,6 @@
 #define MODE_WEIGHTLESS 2
 #define MODE_NEG_WEIGHTLESS 3
 
-//lustiger kommentar
 typedef struct{
     float x;
     float y;
@@ -137,9 +136,12 @@ __kernel void updateParticle(__global Particle3D* pIn,
         }
         
         // velocity change
-        pin->velX = pin->velX * 1.01f;
-        pin->velY = pin->velY * 1.01f;
-        pin->velZ = pin->velZ * 1.01f;
+//        pin->velX = pin->velX * 1.01f;
+//        pin->velY = pin->velY * 1.01f;
+//        pin->velZ = pin->velZ * 1.01f;
+        pin->velX = pin->velX / 1.05f;
+        pin->velY = pin->velY / 1.05f;
+        pin->velZ = pin->velZ / 1.05f;
         
         // straight movement
         pin->x = (pin->x) + pin->velX;
