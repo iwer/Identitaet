@@ -38,24 +38,26 @@ __kernel void updateParticle(__global Particle3D* pIn,
     
     float diffSpeedY = GRAVITY * DELTATIME;
 
+    //###########################################################
+    // GRAVITY MODE
     
     if(mode == MODE_GRAVITY) {
         if(pin->dir == 1) {
             pin->dir = 0;
         }
-        // rightWall contact || leftWall contact
+        // rightWall contact || leftWall contact flips X velocity
         if (((pin->x) + (pin->velX) > rightWall) ||
             ((pin->x) + (pin->velX) < leftWall)) {
             pin->velX = -(pin->velX);
         }
     
-        // backWall contact || frontWall contact
+        // backWall contact || frontWall contact flips Z velocity
         if (((pin->z) + (pin->velZ) > backWall) ||
             ((pin->z) + (pin->velZ) < 0)) {
             pin->velZ = -(pin->velZ);
         }
         
-        // floor contact
+        // floor contact flips and damps Z velocity
         if((pin->y) + (pin->velY) < floor) {
             pin->velX = (pin->velX) * 0.8f;
             pin->velY = -(pin->velY) * 0.10f;
@@ -63,6 +65,7 @@ __kernel void updateParticle(__global Particle3D* pIn,
             
             pin->y = pin->y + pin->velY;
             
+            // fade out if too slow and near floor
             if(((pin->velY) < 0.6f) && (pin->y) < (floor + 2)) {
                 //pin->velX = 0;
                 //pin->velY = 0;
@@ -82,6 +85,9 @@ __kernel void updateParticle(__global Particle3D* pIn,
         // velocity change
         pin->velY = pin->velY + diffSpeedY;
         
+    //###########################################################
+    // WEIGHTLESS MODE
+
     } else if (mode == MODE_WEIGHTLESS) {
         // rightWall contact || leftWall contact
         if (((pin->x) + (pin->velX) > rightWall) ||
@@ -109,7 +115,10 @@ __kernel void updateParticle(__global Particle3D* pIn,
         pin->x = (pin->x) + pin->velX;
         pin->y = (pin->y) + pin->velY;
         pin->z = (pin->z) + pin->velZ;
-        
+
+    //###########################################################
+    // REVERSE WEIGHTLESS MODE
+
     } else if (mode == MODE_NEG_WEIGHTLESS) {
         if(pin->dir == 0){
             pin->velX = -pin->velX;
