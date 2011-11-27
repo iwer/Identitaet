@@ -4,6 +4,7 @@
 #define MODE_GRAVITY 1
 #define MODE_WEIGHTLESS 2
 #define MODE_NEG_WEIGHTLESS 3
+#define MODE_RANDOM 4
 
 typedef struct{
     float x;
@@ -64,13 +65,13 @@ __kernel void updateParticle(__global Particle3D* pIn,
             pin->y = pin->y + pin->velY;
             
             if(((pin->velY) < 0.6f) && (pin->y) < (floor + 2)) {
-                //pin->velX = 0;
-                //pin->velY = 0;
-                //pin->velZ = 0;
+                pin->velX = 0;
+                pin->velY = 0;
+                pin->velZ = 0;
                 //cin->r = (cin->r) - 0.01f;
                 //cin->g = (cin->g) - 0.01f;
                 //cin->b = (cin->b) - 0.01f;
-                cin->a = (cin->a) - 0.0025f;
+                //cin->a = (cin->a) - 0.0025f;
             }
         } 
         
@@ -83,6 +84,9 @@ __kernel void updateParticle(__global Particle3D* pIn,
         pin->velY = pin->velY + diffSpeedY;
         
     } else if (mode == MODE_WEIGHTLESS) {
+        if(pin->dir == 1) {
+            pin->dir = 0;
+        }
         // rightWall contact || leftWall contact
         if (((pin->x) + (pin->velX) > rightWall) ||
             ((pin->x) + (pin->velX) < leftWall)) {
@@ -147,6 +151,41 @@ __kernel void updateParticle(__global Particle3D* pIn,
         pin->x = (pin->x) + pin->velX;
         pin->y = (pin->y) + pin->velY;
         pin->z = (pin->z) + pin->velZ;        
+    } else if(mode == MODE_RANDOM) {
+        if(pin->dir == 1) {
+            pin->dir = 0;
+        }
+
+        // rightWall contact || leftWall contact
+        if (((pin->x) + (pin->velX) > rightWall) ||
+            ((pin->x) + (pin->velX) < leftWall)) {
+            pin->velX = -(pin->velX);
+        }
+    
+        // backWall contact || frontWall contact
+        if (((pin->z) + (pin->velZ) > backWall) ||
+            ((pin->z) + (pin->velZ) < 0)) {
+            pin->velZ = -(pin->velZ);
+        }
+        
+        // floor contact
+        if (((pin->y) + (pin->velY) < floor) || 
+            ((pin->y) + (pin->velY) > floor + 3000)) {
+            pin->velY = -(pin->velY);
+        }
+
+        
+        // straight movement
+        pin->x = (pin->x) + pin->velX;
+        pin->y = (pin->y) + pin->velY;
+        pin->z = (pin->z) + pin->velZ; 
+        
+        // velocity change
+        /*
+        if(pin->velX < 10.0f){ pin->velX = pin->velX * 1.02f; }
+        if(pin->velY < 10.0f){ pin->velY = pin->velX * 1.02f; }
+        if(pin->velZ < 10.0f){ pin->velZ = pin->velX * 1.02f; }
+        */
     }
     
     
