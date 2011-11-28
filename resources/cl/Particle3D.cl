@@ -179,7 +179,7 @@ __kernel void updateParticle(__global Particle3D* pIn,
         
         // floor contact
         if (((pin->y) + (pin->velY) < floor) || 
-            ((pin->y) + (pin->velY) > floor + 3000)) {
+            (((pin->y) + (pin->velY)) > (floor + 3000))) {
             pin->velY = -(pin->velY);
         }
 

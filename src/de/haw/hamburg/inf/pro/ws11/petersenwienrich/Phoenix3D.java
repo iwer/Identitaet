@@ -90,6 +90,7 @@ public class Phoenix3D extends PApplet {
     // for the user colors
     private PImage rgbImg;
     private PImage backgroundImg;
+    private PImage floorImg;
 
     // stopwatch
     long timestamp;
@@ -102,9 +103,7 @@ public class Phoenix3D extends PApplet {
 
     private int moveBackCounter;
 
-    private final int[] texture = new int[1];
-
-    private final boolean brutal = false;
+    private final int[] texture = new int[2];
 
     @Override
     public void setup() {
@@ -131,13 +130,11 @@ public class Phoenix3D extends PApplet {
         floorLevel = -(height + 500);
         leftWall = -3000;
         rightWall = 3000;
-        backWall = 5000;
+        backWall = 4000;
         backGroundWall = 4000;
 
-        backgroundImg = loadImage(IMG_RESSOURCE + "background.jpg");
-        int tc = backgroundImg.pixels[0];
-        System.out.println("BG Image format: " + backgroundImg.format + "\nred:" + red(tc) + " green:" + green(tc) + " blue:" + blue(tc)
-                + " alpha:" + alpha(tc));
+        backgroundImg = loadImage(IMG_RESSOURCE + "background2.jpg");
+        floorImg = loadImage(IMG_RESSOURCE + "floor2.jpg");
 
         // initialize GL object
         timestamp = millis();
@@ -150,14 +147,20 @@ public class Phoenix3D extends PApplet {
         gl.glEnable(GL.GL_BLEND);
         gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE);
 
-        gl.glGenTextures(1, texture, 0);
+        gl.glGenTextures(2, texture, 0);
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture[0]);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
-        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, backgroundImg.width, backgroundImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
-                IntBuffer.wrap(backgroundImg.pixels));
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, backgroundImg.width, backgroundImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE, IntBuffer.wrap(backgroundImg.pixels));
+        gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
+        gl.glBindTexture(GL.GL_TEXTURE_2D, texture[1]);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, floorImg.width, floorImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE, IntBuffer.wrap(floorImg.pixels));
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
 
         // gl.glBindTexture(GL.GL_TEXTURE_2D, texture[0]);
@@ -195,7 +198,7 @@ public class Phoenix3D extends PApplet {
 
         timestamp = millis();
         for (int i = 0; i < NUM_PARTICLES; i++) {
-            particle[i] = new Particle3D(0, floorLevel, backWall / 2, 0, 0, 0);
+            particle[i] = new Particle3D(0, floorLevel, 0, 0, 0, 0);
             particleBuffer.put(particle[i].x);
             particleBuffer.put(particle[i].y);
             particleBuffer.put(particle[i].z);
@@ -206,7 +209,7 @@ public class Phoenix3D extends PApplet {
             colorBuffer.put(red(particleColor[i]));
             colorBuffer.put(green(particleColor[i]));
             colorBuffer.put(blue(particleColor[i]));
-            colorBuffer.put(255);
+            colorBuffer.put(0);
         }
 
         particleBuffer.rewind();
@@ -262,63 +265,40 @@ public class Phoenix3D extends PApplet {
     private void updateMayorMode() {
         /* ################################################ */
         // Sequential all modes
-        // if (mayorMode == MODE_STATIC) {
-        // if (moveBackCounter >= 100) {
-        // mayorMode = MODE_GRAVITY;
-        // gravityMode = GRAVITY_EXPLODE;
-        // System.out.println("Explode");
-        // moveBackCounter = 0;
-        // drawCount = 0;
-        // } else {
-        // moveBackCounter++;
-        // }
-        // } else if (mayorMode == MODE_GRAVITY && gravityMode ==
-        // GRAVITY_EXPLODE) {
-        // if (moveBackCounter >= 80) {
-        // mayorMode = MODE_RANDOM;
-        // System.out.println("Random");
-        // moveBackCounter = 0;
-        // drawCount = 0;
-        // } else {
-        // moveBackCounter++;
-        // }
-        // } else if (mayorMode == MODE_RANDOM) {
-        // if (moveBackCounter >= 180) {
-        // mayorMode = MODE_WEIGHTLESS;
-        // System.out.println("Weightless");
-        // moveBackCounter = 0;
-        // drawCount = 0;
-        // } else {
-        // moveBackCounter++;
-        // }
-        // } else if (mayorMode == MODE_WEIGHTLESS) {
-        // if (moveBackCounter >= 80) {
-        // mayorMode = MODE_NEG_WEIGHTLESS;
-        // System.out.println("Negativ Weightless");
-        // moveBackCounter = 0;
-        // drawCount = 0;
-        // } else {
-        // moveBackCounter++;
-        // }
-        // } else if (mayorMode == MODE_NEG_WEIGHTLESS) {
-        // if (moveBackCounter >= 1) {
-        // mayorMode = MODE_GRAVITY;
-        // gravityMode = GRAVITY_FALLING;
-        // System.out.println("Falling");
-        // moveBackCounter = 0;
-        // drawCount = 0;
-        // } else {
-        // moveBackCounter++;
-        // }
-        // }
-
-        /* ################################################ */
-        // First Try
-
-        if (mayorMode == MODE_WEIGHTLESS) {
-            if (moveBackCounter >= 80) {
-                mayorMode = MODE_NEG_WEIGHTLESS;
+        if (mayorMode == MODE_STATIC) {
+            if (moveBackCounter >= 100) {
+                mayorMode = MODE_GRAVITY;
+                gravityMode = GRAVITY_EXPLODE;
+                System.out.println("Explode");
                 moveBackCounter = 0;
+                drawCount = 0;
+            } else {
+                moveBackCounter++;
+            }
+        } else if (mayorMode == MODE_GRAVITY && gravityMode == GRAVITY_EXPLODE) {
+            if (moveBackCounter >= 150) {
+                mayorMode = MODE_RANDOM;
+                System.out.println("Random");
+                moveBackCounter = 0;
+                drawCount = 0;
+            } else {
+                moveBackCounter++;
+            }
+        } else if (mayorMode == MODE_RANDOM) {
+            if (moveBackCounter >= 500) {
+                mayorMode = MODE_WEIGHTLESS;
+                System.out.println("Weightless");
+                moveBackCounter = 0;
+                drawCount = 0;
+            } else {
+                moveBackCounter++;
+            }
+        } else if (mayorMode == MODE_WEIGHTLESS) {
+            if (moveBackCounter >= 150) {
+                mayorMode = MODE_NEG_WEIGHTLESS;
+                System.out.println("Negativ Weightless");
+                moveBackCounter = 0;
+                drawCount = 0;
             } else {
                 moveBackCounter++;
             }
@@ -326,19 +306,39 @@ public class Phoenix3D extends PApplet {
             if (moveBackCounter >= 1) {
                 mayorMode = MODE_GRAVITY;
                 gravityMode = GRAVITY_FALLING;
+                System.out.println("Falling");
                 moveBackCounter = 0;
+                drawCount = 0;
             } else {
                 moveBackCounter++;
             }
         }
+
+        /* ################################################ */
+        // First Try
+
+        // if (mayorMode == MODE_WEIGHTLESS) {
+        // if (moveBackCounter >= 80) {
+        // mayorMode = MODE_NEG_WEIGHTLESS;
+        // moveBackCounter = 0;
+        // } else {
+        // moveBackCounter++;
+        // }
+        // } else if (mayorMode == MODE_NEG_WEIGHTLESS) {
+        // if (moveBackCounter >= 1) {
+        // mayorMode = MODE_GRAVITY;
+        // gravityMode = GRAVITY_FALLING;
+        // moveBackCounter = 0;
+        // } else {
+        // moveBackCounter++;
+        // }
+        // }
         /* ################################################ */
     }
 
     @Override
     public void draw() {
-        if (mayorMode == MODE_RANDOM) {
-            System.out.println("Entering draw()");
-        }
+
         PGraphicsOpenGL pgl = (PGraphicsOpenGL) g;
         ni.update();
 
@@ -355,6 +355,8 @@ public class Phoenix3D extends PApplet {
 
         rgbImg = ni.rgbImage();
 
+        PVector[] userCenters = null;
+
         int pointCloudSteps = 2; // to speed up the drawing, draw every third
                                  // point
                                  // drawBackground();
@@ -364,6 +366,11 @@ public class Phoenix3D extends PApplet {
         int firstChangedParticleNr = tmpParticleNumber;
         if (userCount > 0) {
             userMap = ni.getUsersPixels(SimpleOpenNI.USERS_ALL);
+            userCenters = new PVector[userCount];
+            // calculate mass centers
+            // for (int i = 0; i < userCount; i++) {
+            // userCenters[i] = getCenterOfMass(userMap, i);
+            // }
 
             if (mayorMode == MODE_STATIC) {
                 drawBackground();
@@ -389,21 +396,65 @@ public class Phoenix3D extends PApplet {
 
         drawRoom();
         Render();
+        // drawCenterOfMass(userCenters);
 
         System.out.println("FPS:" + fpsCounter.getFrequency());
     }
 
+    private PVector getCenterOfMass(int[] userMap, int userNr) {
+        PVector center = new PVector();
+        long sumX = 0;
+        long sumY = 0;
+        long sumZ = 0;
+        int count = 0;
+        PVector realWorldPoint;
+
+        for (int i = 0; i < userMap.length; i++) {
+            // int x = i % ni.depthWidth();
+            // int y = (i - x) / ni.depthHeight();
+            realWorldPoint = ni.depthMapRealWorld()[i];
+            if (userMap[i] == userNr) {
+                sumX += realWorldPoint.x;
+                sumY += realWorldPoint.y;
+                sumZ += realWorldPoint.z;
+
+                count++;
+            }
+        }
+
+        center.x = sumX / count;
+        center.y = sumY / count;
+        center.z = sumZ / count;
+
+        return center;
+    }
+
+    private void drawCenterOfMass(PVector[] centers) {
+        if (centers != null) {
+            gl = pgl.beginGL();
+            gl.glBegin(GL.GL_POINTS);
+            for (int i = 0; i < centers.length; i++) {
+                gl.glColor3f(0, 255, 0);
+                gl.glVertex3f(centers[i].x, centers[i].y, centers[i].z);
+            }
+            gl.glEnd();
+        }
+    }
+
     private void makeAllParticlesRandom() {
-        System.out.println("Entering makeAllParticlesRandom()");
 
         if (drawCount <= 0) {
+
             for (int i = 0; i < NUM_PARTICLES; i++) {
                 if (tmpParticleNumber >= NUM_PARTICLES) {
                     tmpParticleNumber = 0;
-                } // particle[i].y = floorLevel;
-                particle[tmpParticleNumber].velX = random(-20, 20);
-                particle[tmpParticleNumber].velY = random(0, 20);
-                particle[tmpParticleNumber].velZ = random(-20, 20);
+                }
+                particle[i].y = floorLevel;
+                float a = random(80, 100);
+                float b = random(0, 360);
+                particle[tmpParticleNumber].velX = 20 * sin(a) * cos(b);
+                particle[tmpParticleNumber].velY = 20 * cos(a);
+                particle[tmpParticleNumber].velZ = 20 * sin(a) * sin(b);
                 updateVBOParticle(tmpParticleNumber);
 
                 // paintParticle(color(165, 180, 10), i);
@@ -414,7 +465,6 @@ public class Phoenix3D extends PApplet {
     }
 
     private void createFreeMovingParticles(int pointCloudSteps, int[] userMap) {
-        System.out.println("Drawing free moving Points");
         PVector realWorldPoint;
         if (userMap != null) {
             if (drawCount <= 0) {
@@ -424,8 +474,7 @@ public class Phoenix3D extends PApplet {
                     int y = (i - x) / ni.depthHeight();
                     // check if there is a user
                     if (userMap[i] != 0) {
-                        createGravityParticle(realWorldPoint.x + random(-2, 2), realWorldPoint.y + random(-2, 2), realWorldPoint.z
-                                + random(-2, 2), x, y);
+                        createGravityParticle(realWorldPoint.x + random(-2, 2), realWorldPoint.y + random(-2, 2), realWorldPoint.z + random(-2, 2), x, y);
                     }
                 }
             }
@@ -434,7 +483,6 @@ public class Phoenix3D extends PApplet {
     }
 
     private void drawStaticPoints(PGraphicsOpenGL pgl, int pointCloudSteps, int[] userMap) {
-        System.out.println("Drawing static Points");
         PVector realWorldPoint;
         if (userMap != null) {
             gl = pgl.beginGL();
@@ -451,13 +499,13 @@ public class Phoenix3D extends PApplet {
                     // gl.glColor3f(norm(random(255), 0, 255),
                     // norm(random(255), 0, 255), norm(random(255), 0,
                     // 255));
-                    gl.glColor3f(norm(red(rgbImg.get(x, y)), 0, 255), norm(green(rgbImg.get(x, y)), 0, 255),
-                            norm(blue(rgbImg.get(x, y)), 0, 255));
+                    gl.glColor3f(norm(red(rgbImg.get(x, y)), 0, 255), norm(green(rgbImg.get(x, y)), 0, 255), norm(blue(rgbImg.get(x, y)), 0, 255));
 
                     // gl.glColor3f(1.0f, 0, 0);
                     gl.glVertex3f(realWorldPoint.x, realWorldPoint.y, realWorldPoint.z);
                 }
             }
+
             gl.glEnd();
             gl.glDisable(GL.GL_POINTS);
             pgl.endGL();
@@ -469,28 +517,50 @@ public class Phoenix3D extends PApplet {
         gl = pgl.beginGL();
         {
             gl.glEnable(GL.GL_TEXTURE_2D);
-            gl.glActiveTexture(GL.GL_TEXTURE0);
+            // gl.glActiveTexture(GL.GL_TEXTURE0);
             gl.glBindTexture(GL.GL_TEXTURE_2D, texture[0]);
+            gl.glColor3f(255, 255, 255);
 
             gl.glBegin(GL.GL_QUADS);
-            gl.glTexCoord2f(0f, 0f);
-            gl.glVertex3f(-(backgroundImg.width * 3), (backgroundImg.height * 3), backGroundWall);
-            gl.glTexCoord2f(1f, 0f);
-            gl.glVertex3f((backgroundImg.width * 3), (backgroundImg.height * 3), backGroundWall);
-            gl.glTexCoord2f(1f, 1f);
-            gl.glVertex3f((backgroundImg.width * 3), -(backgroundImg.height * 3), backGroundWall);
-            gl.glTexCoord2f(0f, 1f);
-            gl.glVertex3f(-(backgroundImg.width * 3), -(backgroundImg.height * 3), backGroundWall);
+            {
+                gl.glTexCoord2f(0f, 0f);
+                gl.glVertex3f(-(backgroundImg.width * 3), (backgroundImg.height * 3), backGroundWall);
+                gl.glTexCoord2f(1f, 0f);
+                gl.glVertex3f((backgroundImg.width * 3), (backgroundImg.height * 3), backGroundWall);
+                gl.glTexCoord2f(1f, 1f);
+                gl.glVertex3f((backgroundImg.width * 3), -(backgroundImg.height * 3), backGroundWall);
+                gl.glTexCoord2f(0f, 1f);
+                gl.glVertex3f(-(backgroundImg.width * 3), -(backgroundImg.height * 3), backGroundWall);
+            }
+            gl.glEnd();
+            gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
+
+            {
+                gl.glEnable(GL.GL_TEXTURE_2D);
+                // gl.glActiveTexture(GL.GL_TEXTURE1);
+                gl.glBindTexture(GL.GL_TEXTURE_2D, texture[1]);
+
+                gl.glBegin(GL.GL_QUADS);
+                gl.glTexCoord2f(0f, 0f);
+                gl.glVertex3f(-(backgroundImg.width * 3), floorLevel, backGroundWall);
+                gl.glTexCoord2f(1f, 0f);
+                gl.glVertex3f((backgroundImg.width * 3), floorLevel, backGroundWall);
+                gl.glTexCoord2f(1f, 1f);
+                gl.glVertex3f((backgroundImg.width * 3), floorLevel, 0);
+                gl.glTexCoord2f(0f, 1f);
+                gl.glVertex3f(-(backgroundImg.width * 3), floorLevel, 0);
+                gl.glDisable(GL.GL_TEXTURE_2D);
+            }
+            gl.glEnd();
+            gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
         }
-        gl.glEnd();
-        gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
-        gl.glDisable(GL.GL_TEXTURE_2D);
         pgl.endGL();
     }
 
     public void drawRoom() {
         gl = pgl.beginGL();
         float c = 255;
+        // line floor
         gl.glBegin(GL.GL_LINE_LOOP);
         {
             gl.glColor3f(c, c, c);
@@ -505,6 +575,7 @@ public class Phoenix3D extends PApplet {
         }
         gl.glEnd();
 
+        // line room
         gl.glBegin(GL.GL_LINES);
         {
             gl.glColor3f(c, c, c);
@@ -602,20 +673,12 @@ public class Phoenix3D extends PApplet {
     }
 
     void Render() {
-
-        System.out.println("Entering Render()");
-        //
-        // PARTICLES DEMO
-        //
         gl.glBindBufferARB(GL.GL_ARRAY_BUFFER_ARB, VBOColorBuffer[0]);
         gl.glEnableClientState(GL.GL_COLOR_ARRAY);
         gl.glColorPointer(4, GL.GL_FLOAT, 0, 0);
 
         gl = pgl.beginGL();
         {
-            // vgl.ortho( App.WIDTH, App.HEIGHT );
-            // gl.glColor3f(255, 255, 255);
-
             openCL.finish();
 
             gl.glBindBufferARB(GL.GL_ARRAY_BUFFER_ARB, VBOParticleBuffer[0]);
@@ -641,25 +704,8 @@ public class Phoenix3D extends PApplet {
         gl.glBufferDataARB(GL_ARRAY_BUFFER_ARB, PARTICLEBYTESIZE, colorBuffer, GL_DYNAMIC_COPY_ARB);
         gl.glBindBufferARB(GL.GL_ARRAY_BUFFER_ARB, 0);
 
-        // clMemParticles.read(particleBytes, 0, PARTICLEBYTESIZE, true);
-        // particleBuffer = particleBytes.asFloatBuffer();
-
-        // if (firstPart <= lastPart) {
-        // for (int i = firstPart; i <= lastPart; i++) {
-        // updateVBOParticle(i);
-        // }
-        // } else {
-        // for (int i = firstPart; i < NUM_PARTICLES; i++) {
-        // updateVBOParticle(i);
-        // }
-        // for (int i = 0; i <= lastPart; i++) {
-        // updateVBOParticle(i);
-        // }
-        // }
-        //
-        // particleBuffer.rewind();
         clMemParticles.write(particleBytes, 0, PARTICLEBYTESIZE, true);
-        // /////////////////////////////////////////
+
         try {
             long wgs = 0;
             clKernel.setArg(0, clMemParticles.getCLMem());
