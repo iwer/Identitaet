@@ -368,9 +368,12 @@ public class Phoenix3D extends PApplet {
             userMap = ni.getUsersPixels(SimpleOpenNI.USERS_ALL);
             userCenters = new PVector[userCount];
             // calculate mass centers
-            // for (int i = 0; i < userCount; i++) {
-            // userCenters[i] = getCenterOfMass(userMap, i);
-            // }
+            for (int i = 0; i < userCount; i++) {
+                // TODO: Test Performance Difference between following two
+                // methods
+                // userCenters[i] = getCenterOfMass(userMap, i);
+                ni.getCoM(i, userCenters[i]);
+            }
 
             if (mayorMode == MODE_STATIC) {
                 drawBackground();
