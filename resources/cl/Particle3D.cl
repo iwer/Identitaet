@@ -1,3 +1,9 @@
+/*
+#ifndef __OPENCL_VERSION__
+    #define __kernel
+    #define __global
+#endif
+*/
 #define GRAVITY -0.981f
 #define DELTATIME 2.0f
 
@@ -5,6 +11,7 @@
 #define MODE_WEIGHTLESS 2
 #define MODE_NEG_WEIGHTLESS 3
 #define MODE_RANDOM 4
+#define MODE_PLANETARY 5
 
 typedef struct{
     float x;
@@ -24,8 +31,15 @@ typedef struct {
 	float a; 
 } Color;
 
+typedef struct {
+    float x;
+    float y;
+    float z;
+} Com;
+
 __kernel void updateParticle(__global Particle3D* pIn, 
-                             __global Color* cIn ,
+                             __global Color* cIn,
+                             __global Com* comIn,
                              float floor, 
                              float leftWall, 
                              float rightWall, 
@@ -159,7 +173,11 @@ __kernel void updateParticle(__global Particle3D* pIn,
         // straight movement
         pin->x = (pin->x) + pin->velX;
         pin->y = (pin->y) + pin->velY;
-        pin->z = (pin->z) + pin->velZ;        
+        pin->z = (pin->z) + pin->velZ;
+
+    //###########################################################
+    // RANDOM MODE
+
     } else if(mode == MODE_RANDOM) {
         if(pin->dir == 1) {
             pin->dir = 0;
@@ -195,6 +213,48 @@ __kernel void updateParticle(__global Particle3D* pIn,
         if(pin->velY < 10.0f){ pin->velY = pin->velX * 1.02f; }
         if(pin->velZ < 10.0f){ pin->velZ = pin->velX * 1.02f; }
         */
+
+    //###########################################################
+    // RANDOM MODE
+
+    } else if(mode == MODE_PLANETARY) {
+        // rightWall contact || leftWall contact
+        if (((pin->x) + (pin->velX) > rightWall) ||
+            ((pin->x) + (pin->velX) < leftWall)) {
+            pin->velX = -(pin->velX);
+        }
+
+        // backWall contact || frontWall contact
+        if (((pin->z) + (pin->velZ) > backWall) ||
+            ((pin->z) + (pin->velZ) < 0)) {
+            pin->velZ = -(pin->velZ);
+        }
+
+        // floor contact
+        if (((pin->y) + (pin->velY) < floor) ||
+            (((pin->y) + (pin->velY)) > (floor + 3000))) {
+            pin->velY = -(pin->velY);
+        }
+
+        // pull to centers
+        if(comIn[0].x != 0 || comIn[0].y != 0 || comIn[0].z != 0){
+            float dirVectX = comIn[0].x - pin->x;
+            float dirVectY = comIn[0].y - pin->y;
+            float dirVectZ = comIn[0].z - pin->z;
+            float dirLen = sqrt(dirVectX * dirVectX + dirVectY * dirVectY + dirVectZ * dirVectZ);
+            dirVectX = (dirVectX / dirLen);
+            dirVectY = (dirVectY / dirLen);
+            dirVectZ = (dirVectZ / dirLen);
+
+            // velocity vector change
+            pin->velX = pin->velX + dirVectX;
+            pin->velY = pin->velY + dirVectY;
+            pin->velZ = pin->velZ + dirVectZ;
+        }
+        // straight movement
+        pin->x = (pin->x) + pin->velX;
+        pin->y = (pin->y) + pin->velY;
+        pin->z = (pin->z) + pin->velZ;
     }
     
     
