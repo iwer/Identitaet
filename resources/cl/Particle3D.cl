@@ -45,7 +45,8 @@ __kernel void updateParticle(__global Particle3D* pIn,
                              float leftWall, 
                              float rightWall, 
                              float backWall, 
-                             int mode) {
+                             int mode,
+                             float forceFactor) {
     // Global work-item ID value
     int id = get_global_id(0);
     // Particle at index id
@@ -255,9 +256,9 @@ __kernel void updateParticle(__global Particle3D* pIn,
         dirVectZ = (dirVectZ / dirLen);
 
         // velocity vector change
-        pin->velX = pin->velX + dirVectX * 2;
-        pin->velY = pin->velY + dirVectY * 2;
-        pin->velZ = pin->velZ + dirVectZ * 2;
+        pin->velX = pin->velX + dirVectX * forceFactor;
+        pin->velY = pin->velY + dirVectY * forceFactor;
+        pin->velZ = pin->velZ + dirVectZ * forceFactor;
 
         // straight movement
         pin->x = (pin->x) + pin->velX;

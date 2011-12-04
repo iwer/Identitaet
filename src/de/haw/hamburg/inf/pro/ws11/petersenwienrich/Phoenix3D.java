@@ -115,6 +115,8 @@ public class Phoenix3D extends PApplet {
 
     private final int[] texture = new int[2];
 
+    private float forceFaktor = 3.0f;
+
     @Override
     public void setup() {
 
@@ -277,6 +279,7 @@ public class Phoenix3D extends PApplet {
         clKernel.setArg(5, rightWall);
         clKernel.setArg(6, backWall);
         clKernel.setArg(7, mayorMode);
+        clKernel.setArg(8, forceFaktor);
 
         gl.glPointSize(POINTSIZE);
         pgl.endGL();
@@ -356,6 +359,17 @@ public class Phoenix3D extends PApplet {
                 moveBackCounter++;
             }
         }
+        // else if (mayorMode == MODE_PLANETARY) {
+        // if (moveBackCounter >= 0) {
+        // if (forceFaktor >= 1000000) {
+        // forceFaktor += 0.1f;
+        // } else {
+        // forceFaktor = 1.0f;
+        // }
+        // } else {
+        // moveBackCounter++;
+        // }
+        // }
         /* ################################################ */
     }
 
@@ -437,7 +451,6 @@ public class Phoenix3D extends PApplet {
                 comBuffer.put(i * 4 + 1, centers[i].y);
                 comBuffer.put(i * 4 + 2, centers[i].z);
                 comBuffer.put(i * 4 + 3, 0);
-                System.out.println("CoM Z: " + centers[i].z);
             }
             for (int i = centers.length; i < MAX_USERS; i++) {
                 comBuffer.put(i * 4 + 0, 0);
@@ -805,6 +818,13 @@ public class Phoenix3D extends PApplet {
         case 'f':
             gravityMode = GRAVITY_FALLING;
             break;
+        case '+':
+            forceFaktor += 0.1f;
+            break;
+        case '-':
+            if (forceFaktor > 1.0f) {
+                forceFaktor -= 0.1f;
+            }
         }
 
         switch (keyCode) {
