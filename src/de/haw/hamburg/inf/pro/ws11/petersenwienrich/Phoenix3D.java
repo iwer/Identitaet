@@ -123,7 +123,8 @@ public class Phoenix3D extends PApplet {
         ni.enableDepth();
         ni.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
         // ni.enableScene();
-        ni.enableRGB(ni.depthWidth(), ni.depthHeight(), 30);
+        // ni.enableRGB(ni.depthWidth(), ni.depthHeight(), 30);
+        ni.enableRGB();
         ni.alternativeViewPointDepthToImage();
         timestamp = millis() - timestamp;
         System.out.println("SimpleOpenNI Setup time: " + timestamp + " ms");
@@ -445,7 +446,7 @@ public class Phoenix3D extends PApplet {
     private void drawCenterOfMass(PVector[] centers) {
         if (centers != null) {
             gl = pgl.beginGL();
-            gl.glPointSize(15);
+            gl.glPointSize(8);
             gl.glBegin(GL.GL_POINTS);
             for (int i = 0; i < centers.length; i++) {
                 gl.glColor3f(0, 255, 0);
@@ -486,7 +487,7 @@ public class Phoenix3D extends PApplet {
                 for (int i = 0; i < userMap.length; i += pointCloudSteps) {
                     realWorldPoint = ni.depthMapRealWorld()[i];
                     int x = i % ni.depthWidth();
-                    int y = (i - x) / ni.depthHeight();
+                    int y = (i - x) / ni.depthWidth();
                     // check if there is a user
                     if (userMap[i] != 0) {
                         createGravityParticle(realWorldPoint.x + random(-2, 2), realWorldPoint.y + random(-2, 2), realWorldPoint.z
@@ -508,7 +509,7 @@ public class Phoenix3D extends PApplet {
             for (int i = 0; i < userMap.length; i += pointCloudSteps) {
                 realWorldPoint = ni.depthMapRealWorld()[i];
                 int x = i % ni.depthWidth();
-                int y = (i - x) / ni.depthHeight();
+                int y = (i - x) / ni.depthWidth();
                 // check if there is a user
                 if (userMap[i] != 0) {
                     // gl.glColor3f(255, 255, 255);
