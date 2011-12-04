@@ -30,6 +30,8 @@ public class Phoenix3D extends PApplet {
     private final int PARTICLEFLOATSIZE = NUM_PARTICLES * PARTICLE_NFLOAT;
     private final int PARTICLEBYTESIZE = PARTICLEFLOATSIZE * 4;
 
+    private static final int POINTSIZE = 2;
+
     // Modes
     private static final int MODE_STATIC = 0;
     private static final int MODE_GRAVITY = 1;
@@ -206,7 +208,7 @@ public class Phoenix3D extends PApplet {
         colorBuffer = colorBytes.asFloatBuffer();
 
         // init CoM Buffer
-        comBytes = openCL.createByteBuffer(MAX_USERS * 3 * OpenCL.SIZEOF_FLOAT);
+        comBytes = openCL.createByteBuffer(MAX_USERS * 4 * OpenCL.SIZEOF_FLOAT);
         comBuffer = comBytes.asFloatBuffer();
 
         timestamp = millis() - timestamp;
@@ -261,7 +263,7 @@ public class Phoenix3D extends PApplet {
         clMemColors = openCL.createBufferFromGLObject(VBOColorBuffer[0], CLMem.Usage.InputOutput);
 
         clMemCom = new OpenCLBuffer();
-        clMemCom.initBuffer(MAX_USERS * 3 * OpenCL.SIZEOF_FLOAT, CLMem.Usage.InputOutput, comBuffer);
+        clMemCom.initBuffer(MAX_USERS * 4 * OpenCL.SIZEOF_FLOAT, CLMem.Usage.InputOutput, comBuffer);
 
         System.out.println("Load particle program");
         openCL.loadProgramFromFile(dataPath(CL_RESSOURCE + "Particle3D.cl"));
@@ -276,7 +278,7 @@ public class Phoenix3D extends PApplet {
         clKernel.setArg(6, backWall);
         clKernel.setArg(7, mayorMode);
 
-        gl.glPointSize(4);
+        gl.glPointSize(POINTSIZE);
         pgl.endGL();
         perspective(95, width / height, 10, 150000);
 
@@ -431,14 +433,17 @@ public class Phoenix3D extends PApplet {
     private void updateComVBO(PVector[] centers) {
         if (centers != null) {
             for (int i = 0; i < centers.length; i++) {
-                comBuffer.put(i + 0, centers[i].x);
-                comBuffer.put(i + 1, centers[i].y);
-                comBuffer.put(i + 2, centers[i].z);
+                comBuffer.put(i * 4 + 0, centers[i].x);
+                comBuffer.put(i * 4 + 1, centers[i].y);
+                comBuffer.put(i * 4 + 2, centers[i].z);
+                comBuffer.put(i * 4 + 3, 0);
+                System.out.println("CoM Z: " + centers[i].z);
             }
             for (int i = centers.length; i < MAX_USERS; i++) {
-                comBuffer.put(i + 0, 0);
-                comBuffer.put(i + 1, 0);
-                comBuffer.put(i + 2, 0);
+                comBuffer.put(i * 4 + 0, 0);
+                comBuffer.put(i * 4 + 1, 0);
+                comBuffer.put(i * 4 + 2, 0);
+                comBuffer.put(i * 4 + 3, 0);
             }
         }
     }
@@ -453,7 +458,7 @@ public class Phoenix3D extends PApplet {
                 gl.glVertex3f(centers[i].x, centers[i].y, centers[i].z);
             }
             gl.glEnd();
-            gl.glPointSize(4);
+            gl.glPointSize(POINTSIZE);
         }
     }
 
@@ -723,7 +728,7 @@ public class Phoenix3D extends PApplet {
         gl.glBindBufferARB(GL.GL_ARRAY_BUFFER_ARB, 0);
 
         clMemParticles.write(particleBytes, 0, PARTICLEBYTESIZE, true);
-        clMemCom.write(comBytes, 0, MAX_USERS * 3 * OpenCL.SIZEOF_FLOAT, true);
+        clMemCom.write(comBytes, 0, MAX_USERS * 4 * OpenCL.SIZEOF_FLOAT, true);
 
         try {
             long wgs = 0;

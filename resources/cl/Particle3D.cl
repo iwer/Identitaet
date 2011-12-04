@@ -35,6 +35,7 @@ typedef struct {
     float x;
     float y;
     float z;
+    float dummy;
 } Com;
 
 __kernel void updateParticle(__global Particle3D* pIn, 
@@ -243,9 +244,9 @@ __kernel void updateParticle(__global Particle3D* pIn,
         // pull to centers
         for(int i = 0; i < 10; i++){
             if(comIn[i].x != 0 || comIn[i].y != 0 || comIn[i].z != 0){
-                dirVectX += comIn[i].x;
-                dirVectY += comIn[i].y;
-                dirVectZ += comIn[i].z;
+                dirVectX += (comIn[i].x - pin->x);
+                dirVectY += (comIn[i].y - pin->y);
+                dirVectZ += (comIn[i].z - pin->z);
             }
         }
         dirLen = sqrt(dirVectX * dirVectX + dirVectY * dirVectY + dirVectZ * dirVectZ);
@@ -254,9 +255,9 @@ __kernel void updateParticle(__global Particle3D* pIn,
         dirVectZ = (dirVectZ / dirLen);
 
         // velocity vector change
-        pin->velX = pin->velX + dirVectX;
-        pin->velY = pin->velY + dirVectY;
-        pin->velZ = pin->velZ + dirVectZ;
+        pin->velX = pin->velX + dirVectX * 2;
+        pin->velY = pin->velY + dirVectY * 2;
+        pin->velZ = pin->velZ + dirVectZ * 2;
 
         // straight movement
         pin->x = (pin->x) + pin->velX;
