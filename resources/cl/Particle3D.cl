@@ -42,6 +42,7 @@ __kernel void updateParticle(__global Particle3D* pIn,
                              __global Color* cIn,
                              __global Com* comIn,
                              float floor, 
+                             float ceiling,
                              float leftWall, 
                              float rightWall, 
                              float backWall, 
@@ -94,6 +95,12 @@ __kernel void updateParticle(__global Particle3D* pIn,
             }
         } 
         
+        if  (((pin->y) + (pin->velY)) > ceiling) {
+            pin->velX = (pin->velX);
+            pin->velY = -(pin->velY);
+            pin->velZ = (pin->velZ);
+        }
+        
         // straight movement
         pin->x = (pin->x) + pin->velX;
         pin->y = (pin->y) + pin->velY;
@@ -122,7 +129,8 @@ __kernel void updateParticle(__global Particle3D* pIn,
         }
 
         // floor contact
-        if((pin->y) + (pin->velY) < floor) {
+        if (((pin->y) + (pin->velY) < floor) || 
+            (((pin->y) + (pin->velY)) > ceiling)) {
             pin->velY = -(pin->velY) * 0.10f;
         }
         
@@ -160,7 +168,8 @@ __kernel void updateParticle(__global Particle3D* pIn,
         }
 
         // floor contact
-        if((pin->y) + (pin->velY) < floor) {
+        if (((pin->y) + (pin->velY) < floor) || 
+            (((pin->y) + (pin->velY)) > ceiling)) {
             pin->velY = -(pin->velY) * 0.10f;
         }
         
@@ -199,7 +208,7 @@ __kernel void updateParticle(__global Particle3D* pIn,
         
         // floor contact
         if (((pin->y) + (pin->velY) < floor) || 
-            (((pin->y) + (pin->velY)) > (floor + 3000))) {
+            (((pin->y) + (pin->velY)) > ceiling)) {
             pin->velY = -(pin->velY);
         }
 
@@ -217,7 +226,7 @@ __kernel void updateParticle(__global Particle3D* pIn,
         */
 
     //###########################################################
-    // RANDOM MODE
+    // PLANETARY MODE
 
     } else if(mode == MODE_PLANETARY) {
         // rightWall contact || leftWall contact
@@ -234,7 +243,7 @@ __kernel void updateParticle(__global Particle3D* pIn,
 
         // floor contact
         if (((pin->y) + (pin->velY) < floor) ||
-            (((pin->y) + (pin->velY)) > (floor + 3000))) {
+            (((pin->y) + (pin->velY)) > ceiling)) {
             pin->velY = -(pin->velY) * 0.5f;
         }
         float dirVectX = 0;
@@ -242,12 +251,17 @@ __kernel void updateParticle(__global Particle3D* pIn,
         float dirVectZ = 0;
         float dirLen = 0;
 
-        // pull to centers
+        // pull to gravitation centers
         for(int i = 0; i < 10; i++){
             if(comIn[i].x != 0 || comIn[i].y != 0 || comIn[i].z != 0){
-                dirVectX += (comIn[i].x - pin->x);
-                dirVectY += (comIn[i].y - pin->y);
-                dirVectZ += (comIn[i].z - pin->z);
+				float tmpX= (comIn[i].x - pin->x);
+				float tmpY= (comIn[i].y - pin->y);
+				float tmpZ= (comIn[i].z - pin->z);
+				float tmpLen = sqrt(tmpX * tmpX + tmpY * tmpY + tmpZ *tmpZ);
+				
+				dirVectX += tmpX * (1 / (tmpLen * tmpLen));
+				dirVectY += tmpY * (1 / (tmpLen * tmpLen));
+				dirVectZ += tmpZ * (1 / (tmpLen * tmpLen));
             }
         }
         dirLen = sqrt(dirVectX * dirVectX + dirVectY * dirVectY + dirVectZ * dirVectZ);
