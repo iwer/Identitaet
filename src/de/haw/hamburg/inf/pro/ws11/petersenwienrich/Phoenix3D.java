@@ -25,7 +25,7 @@ public class Phoenix3D extends PApplet {
     private static final long serialVersionUID = 1L;
 
     // ParticleConstants
-    private final int NUM_PARTICLES = 1024 * 512; // 1024 * 256;
+    private final int NUM_PARTICLES = 1024;// * 512; // 1024 * 256;
     private final int PARTICLE_NFLOAT = 8;
     private final int PARTICLEFLOATSIZE = NUM_PARTICLES * PARTICLE_NFLOAT;
     private final int PARTICLEBYTESIZE = PARTICLEFLOATSIZE * 4;
@@ -170,62 +170,47 @@ public class Phoenix3D extends PApplet {
 
         gl.glGenTextures(5, texture, 0);
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture[0]);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER,
-                GL.GL_NEAREST);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER,
-                GL.GL_NEAREST);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
-        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, backgroundImg.width,
-                backgroundImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, backgroundImg.width, backgroundImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
                 IntBuffer.wrap(backgroundImg.pixels));
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
         // #####
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture[1]);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER,
-                GL.GL_NEAREST);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER,
-                GL.GL_NEAREST);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
-        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, floorImg.width,
-                floorImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, floorImg.width, floorImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
                 IntBuffer.wrap(floorImg.pixels));
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
         // #####
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture[2]);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER,
-                GL.GL_NEAREST);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER,
-                GL.GL_NEAREST);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
-        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, lWallImg.width,
-                lWallImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, lWallImg.width, lWallImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
                 IntBuffer.wrap(lWallImg.pixels));
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
         // #####
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture[3]);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER,
-                GL.GL_NEAREST);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER,
-                GL.GL_NEAREST);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
-        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, rWallImg.width,
-                rWallImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, rWallImg.width, rWallImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
                 IntBuffer.wrap(rWallImg.pixels));
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
         // #####
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture[4]);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER,
-                GL.GL_NEAREST);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER,
-                GL.GL_NEAREST);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
-        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, ceilImg.width,
-                ceilImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, ceilImg.width, ceilImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
                 IntBuffer.wrap(ceilImg.pixels));
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
 
@@ -257,8 +242,7 @@ public class Phoenix3D extends PApplet {
 
         // init color buffer
         particleColor = new int[NUM_PARTICLES];
-        colorBytes = openCL.createByteBuffer(NUM_PARTICLES * 4
-                * OpenCL.SIZEOF_FLOAT);
+        colorBytes = openCL.createByteBuffer(NUM_PARTICLES * 4 * OpenCL.SIZEOF_FLOAT);
         colorBuffer = colorBytes.asFloatBuffer();
 
         // init CoM Buffer
@@ -270,7 +254,7 @@ public class Phoenix3D extends PApplet {
 
         timestamp = millis();
         for (int i = 0; i < NUM_PARTICLES; i++) {
-            particle[i] = new Particle3D(0, floorLevel, 0, 0, 0, 0);
+            particle[i] = new Particle3D(random(leftWall, rightWall), floorLevel, random(0, backWall), 0, 0, 0);
             particleBuffer.put(particle[i].x);
             particleBuffer.put(particle[i].y);
             particleBuffer.put(particle[i].z);
@@ -281,7 +265,7 @@ public class Phoenix3D extends PApplet {
             colorBuffer.put(red(particleColor[i]));
             colorBuffer.put(green(particleColor[i]));
             colorBuffer.put(blue(particleColor[i]));
-            colorBuffer.put(0);
+            colorBuffer.put(alpha(particleColor[i]));
         }
 
         particleBuffer.rewind();
@@ -301,28 +285,23 @@ public class Phoenix3D extends PApplet {
         // This allocates the memory needed to store our point data, and also
         // fills it with our point data (variable:
         // particleBuffer);
-        gl.glBufferDataARB(GL_ARRAY_BUFFER_ARB, PARTICLEBYTESIZE,
-                particleBuffer, GL_DYNAMIC_COPY_ARB);
+        gl.glBufferDataARB(GL_ARRAY_BUFFER_ARB, PARTICLEBYTESIZE, particleBuffer, GL_DYNAMIC_COPY_ARB);
         // detach handle from Buffer
         gl.glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 
         VBOColorBuffer = new int[1];
         gl.glGenBuffersARB(1, VBOColorBuffer, 0);
         gl.glBindBufferARB(GL_ARRAY_BUFFER_ARB, VBOColorBuffer[0]);
-        gl.glBufferDataARB(GL_ARRAY_BUFFER_ARB, PARTICLEBYTESIZE, colorBuffer,
-                GL_DYNAMIC_COPY_ARB);
+        gl.glBufferDataARB(GL_ARRAY_BUFFER_ARB, PARTICLEBYTESIZE, colorBuffer, GL_DYNAMIC_COPY_ARB);
         gl.glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
         timestamp = millis() - timestamp;
         System.out.println("OpenCL VBO Setup time: " + timestamp + " ms");
 
-        clMemParticles = openCL.createBufferFromGLObject(VBOParticleBuffer[0],
-                CLMem.Usage.InputOutput);
-        clMemColors = openCL.createBufferFromGLObject(VBOColorBuffer[0],
-                CLMem.Usage.InputOutput);
+        clMemParticles = openCL.createBufferFromGLObject(VBOParticleBuffer[0], CLMem.Usage.InputOutput);
+        clMemColors = openCL.createBufferFromGLObject(VBOColorBuffer[0], CLMem.Usage.InputOutput);
 
         clMemCom = new OpenCLBuffer();
-        clMemCom.initBuffer(MAX_USERS * 4 * OpenCL.SIZEOF_FLOAT,
-                CLMem.Usage.InputOutput, comBuffer);
+        clMemCom.initBuffer(MAX_USERS * 4 * OpenCL.SIZEOF_FLOAT, CLMem.Usage.InputOutput, comBuffer);
 
         System.out.println("Load particle program");
         openCL.loadProgramFromFile(dataPath(CL_RESSOURCE + "Particle3D.cl"));
@@ -346,61 +325,64 @@ public class Phoenix3D extends PApplet {
     }
 
     private void updateMayorMode() {
-        /* ################################################ */
+        // demo1();
+        // demo2();
+
+    }
+
+    private void demo2() {
         // Sequential all modes
-        // if (mayorMode == MODE_STATIC) {
-        // if (moveBackCounter >= 100) {
-        // mayorMode = MODE_GRAVITY;
-        // gravityMode = GRAVITY_EXPLODE;
-        // System.out.println("Explode");
-        // moveBackCounter = 0;
-        // drawCount = 0;
-        // } else {
-        // moveBackCounter++;
-        // }
-        // } else if (mayorMode == MODE_GRAVITY && gravityMode ==
-        // GRAVITY_EXPLODE) {
-        // if (moveBackCounter >= 150) {
-        // mayorMode = MODE_RANDOM;
-        // System.out.println("Random");
-        // moveBackCounter = 0;
-        // drawCount = 0;
-        // } else {
-        // moveBackCounter++;
-        // }
-        // } else if (mayorMode == MODE_RANDOM) {
-        // if (moveBackCounter >= 500) {
-        // mayorMode = MODE_WEIGHTLESS;
-        // System.out.println("Weightless");
-        // moveBackCounter = 0;
-        // drawCount = 0;
-        // } else {
-        // moveBackCounter++;
-        // }
-        // } else if (mayorMode == MODE_WEIGHTLESS) {
-        // if (moveBackCounter >= 150) {
-        // mayorMode = MODE_NEG_WEIGHTLESS;
-        // System.out.println("Negativ Weightless");
-        // moveBackCounter = 0;
-        // drawCount = 0;
-        // } else {
-        // moveBackCounter++;
-        // }
-        // } else if (mayorMode == MODE_NEG_WEIGHTLESS) {
-        // if (moveBackCounter >= 1) {
-        // mayorMode = MODE_GRAVITY;
-        // gravityMode = GRAVITY_FALLING;
-        // System.out.println("Falling");
-        // moveBackCounter = 0;
-        // drawCount = 0;
-        // } else {
-        // moveBackCounter++;
-        // }
-        // }
+        if (mayorMode == MODE_STATIC) {
+            if (moveBackCounter >= 100) {
+                mayorMode = MODE_GRAVITY;
+                gravityMode = GRAVITY_EXPLODE;
+                System.out.println("Explode");
+                moveBackCounter = 0;
+                drawCount = 0;
+            } else {
+                moveBackCounter++;
+            }
+        } else if (mayorMode == MODE_GRAVITY && gravityMode == GRAVITY_EXPLODE) {
+            if (moveBackCounter >= 150) {
+                mayorMode = MODE_RANDOM;
+                System.out.println("Random");
+                moveBackCounter = 0;
+                drawCount = 0;
+            } else {
+                moveBackCounter++;
+            }
+        } else if (mayorMode == MODE_RANDOM) {
+            if (moveBackCounter >= 500) {
+                mayorMode = MODE_WEIGHTLESS;
+                System.out.println("Weightless");
+                moveBackCounter = 0;
+                drawCount = 0;
+            } else {
+                moveBackCounter++;
+            }
+        } else if (mayorMode == MODE_WEIGHTLESS) {
+            if (moveBackCounter >= 150) {
+                mayorMode = MODE_NEG_WEIGHTLESS;
+                System.out.println("Negativ Weightless");
+                moveBackCounter = 0;
+                drawCount = 0;
+            } else {
+                moveBackCounter++;
+            }
+        } else if (mayorMode == MODE_NEG_WEIGHTLESS) {
+            if (moveBackCounter >= 1) {
+                mayorMode = MODE_GRAVITY;
+                gravityMode = GRAVITY_FALLING;
+                System.out.println("Falling");
+                moveBackCounter = 0;
+                drawCount = 0;
+            } else {
+                moveBackCounter++;
+            }
+        }
+    }
 
-        /* ################################################ */
-        // First Try
-
+    private void demo1() {
         if (mayorMode == MODE_WEIGHTLESS) {
             if (moveBackCounter >= 80) {
                 mayorMode = MODE_NEG_WEIGHTLESS;
@@ -417,18 +399,6 @@ public class Phoenix3D extends PApplet {
                 moveBackCounter++;
             }
         }
-        // else if (mayorMode == MODE_PLANETARY) {
-        // if (moveBackCounter >= 0) {
-        // if (forceFaktor >= 1000000) {
-        // forceFaktor += 0.1f;
-        // } else {
-        // forceFaktor = 1.0f;
-        // }
-        // } else {
-        // moveBackCounter++;
-        // }
-        // }
-        /* ################################################ */
     }
 
     @Override
@@ -459,8 +429,7 @@ public class Phoenix3D extends PApplet {
         }
 
         int[] userMap = null;
-        int lastChangedParticleNr = tmpParticleNumber;
-        int firstChangedParticleNr = tmpParticleNumber;
+
         if (userCount > 0) {
             userMap = ni.getUsersPixels(SimpleOpenNI.USERS_ALL);
             userCenters = new PVector[userCount];
@@ -474,19 +443,14 @@ public class Phoenix3D extends PApplet {
             if (mayorMode == MODE_STATIC) {
                 drawBackground();
                 drawStaticPoints(pgl, pointCloudSteps, userMap);
-                lastChangedParticleNr = tmpParticleNumber;
             } else if (mayorMode == MODE_GRAVITY) {
                 createFreeMovingParticles(pointCloudSteps, userMap, 100);
-                lastChangedParticleNr = tmpParticleNumber;
                 drawBackground();
-            } else if (mayorMode == MODE_WEIGHTLESS
-                    || mayorMode == MODE_NEG_WEIGHTLESS) {
+            } else if (mayorMode == MODE_WEIGHTLESS || mayorMode == MODE_NEG_WEIGHTLESS) {
                 createFreeMovingParticles(pointCloudSteps, userMap, 0);
-                lastChangedParticleNr = tmpParticleNumber;
                 drawBackground();
             } else if (mayorMode == MODE_RANDOM) {
                 makeAllParticlesRandom();
-                lastChangedParticleNr = tmpParticleNumber;
                 drawBackground();
             } else if (mayorMode == MODE_PLANETARY) {
                 drawBackground();
@@ -498,7 +462,7 @@ public class Phoenix3D extends PApplet {
             drawBackground();
 
         }
-        Update(firstChangedParticleNr, lastChangedParticleNr);
+        Update();
 
         // drawRoom();
         Render();
@@ -529,10 +493,11 @@ public class Phoenix3D extends PApplet {
             gl.glPointSize(8);
             gl.glBegin(GL.GL_POINTS);
             for (int i = 0; i < centers.length; i++) {
-                if (centers[i].x != 0 && centers[i].y != 0 && centers[i].z != 0) {
-                    gl.glColor3f(0, 255, 0);
-                    gl.glVertex3f(centers[i].x, centers[i].y, centers[i].z);
-                }
+                // if (centers[i].x != 0 && centers[i].y != 0 && centers[i].z !=
+                // 0) {
+                gl.glColor3f(0, 255, 0);
+                gl.glVertex3f(centers[i].x, centers[i].y, centers[i].z);
+                // }
             }
             gl.glEnd();
             gl.glPointSize(POINTSIZE);
@@ -555,15 +520,13 @@ public class Phoenix3D extends PApplet {
                 particle[tmpParticleNumber].velZ = 20 * sin(a) * sin(b);
                 updateVBOParticle(tmpParticleNumber);
 
-                // paintParticle(color(165, 180, 10), i);
                 tmpParticleNumber++;
             }
             drawCount++;
         }
     }
 
-    private void createFreeMovingParticles(int pointCloudSteps, int[] userMap,
-            int howOften) {
+    private void createFreeMovingParticles(int pointCloudSteps, int[] userMap, int howOften) {
         PVector realWorldPoint;
         if (userMap != null) {
             if (drawCount <= howOften) {
@@ -573,9 +536,8 @@ public class Phoenix3D extends PApplet {
                     int y = (i - x) / ni.depthWidth();
                     // check if there is a user
                     if (userMap[i] != 0) {
-                        createGravityParticle(realWorldPoint.x + random(-2, 2),
-                                realWorldPoint.y + random(-2, 2),
-                                realWorldPoint.z + random(-2, 2), x, y);
+                        createGravityParticle(realWorldPoint.x + random(-2, 2), realWorldPoint.y + random(-2, 2), realWorldPoint.z
+                                + random(-2, 2), x, y);
                     }
                 }
             }
@@ -583,8 +545,7 @@ public class Phoenix3D extends PApplet {
         }
     }
 
-    private void drawStaticPoints(PGraphicsOpenGL pgl, int pointCloudSteps,
-            int[] userMap) {
+    private void drawStaticPoints(PGraphicsOpenGL pgl, int pointCloudSteps, int[] userMap) {
         PVector realWorldPoint;
         if (userMap != null) {
             gl = pgl.beginGL();
@@ -597,17 +558,11 @@ public class Phoenix3D extends PApplet {
                 int y = (i - x) / ni.depthWidth();
                 // check if there is a user
                 if (userMap[i] != 0) {
-                    // gl.glColor3f(255, 255, 255);
-                    // gl.glColor3f(norm(random(255), 0, 255),
-                    // norm(random(255), 0, 255), norm(random(255), 0,
-                    // 255));
-                    gl.glColor3f(norm(red(rgbImg.get(x, y)), 0, 255),
-                            norm(green(rgbImg.get(x, y)), 0, 255),
+
+                    gl.glColor3f(norm(red(rgbImg.get(x, y)), 0, 255), norm(green(rgbImg.get(x, y)), 0, 255),
                             norm(blue(rgbImg.get(x, y)), 0, 255));
 
-                    // gl.glColor3f(1.0f, 0, 0);
-                    gl.glVertex3f(realWorldPoint.x, realWorldPoint.y,
-                            realWorldPoint.z);
+                    gl.glVertex3f(realWorldPoint.x, realWorldPoint.y, realWorldPoint.z);
                 }
             }
 
@@ -622,7 +577,6 @@ public class Phoenix3D extends PApplet {
         gl = pgl.beginGL();
         {
             gl.glEnable(GL.GL_TEXTURE_2D);
-            // gl.glActiveTexture(GL.GL_TEXTURE0);
             gl.glBindTexture(GL.GL_TEXTURE_2D, texture[0]);
             gl.glColor3f(255, 255, 255);
 
@@ -641,7 +595,6 @@ public class Phoenix3D extends PApplet {
             gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
 
             gl.glEnable(GL.GL_TEXTURE_2D);
-            // gl.glActiveTexture(GL.GL_TEXTURE1);
             gl.glBindTexture(GL.GL_TEXTURE_2D, texture[1]);
 
             gl.glBegin(GL.GL_QUADS);
@@ -679,7 +632,6 @@ public class Phoenix3D extends PApplet {
             gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
 
             gl.glEnable(GL.GL_TEXTURE_2D);
-            // gl.glActiveTexture(GL.GL_TEXTURE1);
             gl.glBindTexture(GL.GL_TEXTURE_2D, texture[3]);
 
             gl.glBegin(GL.GL_QUADS);
@@ -698,7 +650,6 @@ public class Phoenix3D extends PApplet {
             gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
 
             gl.glEnable(GL.GL_TEXTURE_2D);
-            // gl.glActiveTexture(GL.GL_TEXTURE1);
             gl.glBindTexture(GL.GL_TEXTURE_2D, texture[4]);
 
             gl.glBegin(GL.GL_QUADS);
@@ -755,8 +706,7 @@ public class Phoenix3D extends PApplet {
         pgl.endGL();
     }
 
-    public void createWeightlessParticle(float x, float y, float z, int realX,
-            int realY) {
+    public void createWeightlessParticle(float x, float y, float z, int realX, int realY) {
         if (tmpParticleNumber >= NUM_PARTICLES) {
             tmpParticleNumber = 0;
         }
@@ -764,8 +714,7 @@ public class Phoenix3D extends PApplet {
         tmpParticleNumber++;
     }
 
-    public void createWeightlessParticle(float x, float y, float z, int realX,
-            int realY, int particleNumber) {
+    public void createWeightlessParticle(float x, float y, float z, int realX, int realY, int particleNumber) {
         if (z <= 10) {
             return;
         }
@@ -786,8 +735,7 @@ public class Phoenix3D extends PApplet {
         paintParticle(realX, realY, particleNumber);
     }
 
-    public void createGravityParticle(float x, float y, float z, int realX,
-            int realY) {
+    public void createGravityParticle(float x, float y, float z, int realX, int realY) {
         if (tmpParticleNumber >= NUM_PARTICLES) {
             tmpParticleNumber = 0;
         }
@@ -795,8 +743,7 @@ public class Phoenix3D extends PApplet {
         tmpParticleNumber++;
     }
 
-    public void createGravityParticle(float x, float y, float z, int realX,
-            int realY, int particleNumber) {
+    public void createGravityParticle(float x, float y, float z, int realX, int realY, int particleNumber) {
         if (z <= 10) {
             return;
         }
@@ -832,14 +779,10 @@ public class Phoenix3D extends PApplet {
     private void paintParticle(int color, int particleNumber) {
         particleColor[particleNumber] = color;
 
-        colorBuffer.put(particleNumber * 4 + 0,
-                norm(red(particleColor[particleNumber]), 0, 255));
-        colorBuffer.put(particleNumber * 4 + 1,
-                norm(green(particleColor[particleNumber]), 0, 255));
-        colorBuffer.put(particleNumber * 4 + 2,
-                norm(blue(particleColor[particleNumber]), 0, 255));
-        colorBuffer.put(particleNumber * 4 + 3,
-                norm(alpha(particleColor[particleNumber]), 0, 255));
+        colorBuffer.put(particleNumber * 4 + 0, norm(red(particleColor[particleNumber]), 0, 255));
+        colorBuffer.put(particleNumber * 4 + 1, norm(green(particleColor[particleNumber]), 0, 255));
+        colorBuffer.put(particleNumber * 4 + 2, norm(blue(particleColor[particleNumber]), 0, 255));
+        colorBuffer.put(particleNumber * 4 + 3, norm(alpha(particleColor[particleNumber]), 0, 255));
     }
 
     void Render() {
@@ -866,13 +809,12 @@ public class Phoenix3D extends PApplet {
 
     }
 
-    void Update(int firstPart, int lastPart) {
+    void Update() {
 
         openCL.acquireGLObjects();
 
         gl.glBindBufferARB(GL.GL_ARRAY_BUFFER_ARB, VBOColorBuffer[0]);
-        gl.glBufferDataARB(GL_ARRAY_BUFFER_ARB, PARTICLEBYTESIZE, colorBuffer,
-                GL_DYNAMIC_COPY_ARB);
+        gl.glBufferDataARB(GL_ARRAY_BUFFER_ARB, PARTICLEBYTESIZE, colorBuffer, GL_DYNAMIC_COPY_ARB);
         gl.glBindBufferARB(GL.GL_ARRAY_BUFFER_ARB, 0);
 
         clMemParticles.write(particleBytes, 0, PARTICLEBYTESIZE, true);
@@ -906,46 +848,43 @@ public class Phoenix3D extends PApplet {
     }
 
     private void updateVBOParticle(int particleNumber) {
-        particleBuffer.put(particleNumber * PARTICLE_NFLOAT + 0,
-                particle[particleNumber].x);
-        particleBuffer.put(particleNumber * PARTICLE_NFLOAT + 1,
-                particle[particleNumber].y);
-        particleBuffer.put(particleNumber * PARTICLE_NFLOAT + 2,
-                particle[particleNumber].z);
-        particleBuffer.put(particleNumber * PARTICLE_NFLOAT + 3,
-                particle[particleNumber].velX);
-        particleBuffer.put(particleNumber * PARTICLE_NFLOAT + 4,
-                particle[particleNumber].velY);
-        particleBuffer.put(particleNumber * PARTICLE_NFLOAT + 5,
-                particle[particleNumber].velZ);
+        particleBuffer.put(particleNumber * PARTICLE_NFLOAT + 0, particle[particleNumber].x);
+        particleBuffer.put(particleNumber * PARTICLE_NFLOAT + 1, particle[particleNumber].y);
+        particleBuffer.put(particleNumber * PARTICLE_NFLOAT + 2, particle[particleNumber].z);
+        particleBuffer.put(particleNumber * PARTICLE_NFLOAT + 3, particle[particleNumber].velX);
+        particleBuffer.put(particleNumber * PARTICLE_NFLOAT + 4, particle[particleNumber].velY);
+        particleBuffer.put(particleNumber * PARTICLE_NFLOAT + 5, particle[particleNumber].velZ);
     }
 
     // Keyboard events
 
     @Override
     public void mousePressed() {
-        if (mayorMode == MODE_STATIC && gravityMode == GRAVITY_EXPLODE) {
-            mayorMode = MODE_WEIGHTLESS;
-            gravityMode = GRAVITY_FALLING;
-        } else if (mayorMode == MODE_GRAVITY && gravityMode == GRAVITY_FALLING) {
-            mayorMode = MODE_STATIC;
-            drawCount = 0;
-        } else if (mayorMode == MODE_STATIC && gravityMode == GRAVITY_FALLING) {
-            mayorMode = MODE_GRAVITY;
-            gravityMode = GRAVITY_EXPLODE;
-        } else if (mayorMode == MODE_GRAVITY && gravityMode == GRAVITY_EXPLODE) {
-            mayorMode = MODE_RANDOM;
-            drawCount = 0;
-        } else if (mayorMode == MODE_RANDOM) {
-            mayorMode = MODE_PLANETARY;
-            drawCount = 0;
-        } else if (mayorMode == MODE_PLANETARY) {
-            mayorMode = MODE_STATIC;
-            drawCount = 0;
-        }
-        // mayorMode = (mayorMode + 1) % NMODES;
+        // if (mayorMode == MODE_STATIC && gravityMode == GRAVITY_EXPLODE) {
+        // mayorMode = MODE_WEIGHTLESS;
+        // gravityMode = GRAVITY_FALLING;
+        // } else if (mayorMode == MODE_GRAVITY && gravityMode ==
+        // GRAVITY_FALLING) {
+        // mayorMode = MODE_STATIC;
         // drawCount = 0;
-        // System.out.println("Mode: " + mayorMode);
+        // } else if (mayorMode == MODE_STATIC && gravityMode ==
+        // GRAVITY_FALLING) {
+        // mayorMode = MODE_GRAVITY;
+        // gravityMode = GRAVITY_EXPLODE;
+        // } else if (mayorMode == MODE_GRAVITY && gravityMode ==
+        // GRAVITY_EXPLODE) {
+        // mayorMode = MODE_RANDOM;
+        // drawCount = 0;
+        // } else if (mayorMode == MODE_RANDOM) {
+        // mayorMode = MODE_PLANETARY;
+        // drawCount = 0;
+        // } else if (mayorMode == MODE_PLANETARY) {
+        // mayorMode = MODE_STATIC;
+        // drawCount = 0;
+        // }
+        mayorMode = (mayorMode + 1) % NMODES;
+        drawCount = 0;
+        System.out.println("Mode: " + mayorMode);
     }
 
     @Override
