@@ -3,6 +3,8 @@ package de.haw.hamburg.inf.pro.ws11.petersenwienrich;
 import static javax.media.opengl.GL.GL_ARRAY_BUFFER_ARB;
 import static javax.media.opengl.GL.GL_DYNAMIC_COPY_ARB;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -25,7 +27,7 @@ public class Phoenix3D extends PApplet {
     private static final long serialVersionUID = 1L;
 
     // ParticleConstants
-    private final int NUM_PARTICLES = 1024;// * 512; // 1024 * 256;
+    private final int NUM_PARTICLES = 1024 * 128; // 1024 * 256;
     private final int PARTICLE_NFLOAT = 8;
     private final int PARTICLEFLOATSIZE = NUM_PARTICLES * PARTICLE_NFLOAT;
     private final int PARTICLEBYTESIZE = PARTICLEFLOATSIZE * 4;
@@ -41,11 +43,22 @@ public class Phoenix3D extends PApplet {
     private static final int MODE_PLANETARY = 5;
     private static final int NMODES = 6;
 
-    private int mayorMode = MODE_STATIC;
+    private int mayorMode = MODE_GRAVITY;
 
     private static final int GRAVITY_FALLING = 102;
     private static final int GRAVITY_EXPLODE = 103;
-    private int gravityMode = GRAVITY_EXPLODE;
+    private int gravityMode = GRAVITY_FALLING;
+
+    // phasen
+    private static final int PHASE_0_START = 1001;
+    private static final int PHASE_1_CHAOS = 1002;
+    private static final int PHASE_2_SWARMING = 1003;
+    private static final int PHASE_3_BUILDING = 1004;
+    private static final int PHASE_4_BEING = 1005;
+    private static final int PHASE_5_DESINTEGRATING = 1006;
+    private static final int PHASE_6_DIEING = 1007;
+
+    private int phase = PHASE_0_START;
 
     // Ressources Location
     private static final String CL_RESSOURCE = Config.CL_LOCATION;
@@ -112,7 +125,6 @@ public class Phoenix3D extends PApplet {
     private float leftWall;
     private float rightWall;
     private float backWall;
-    private float backGroundWall;
     private float ceiling;
 
     private int moveBackCounter;
@@ -120,6 +132,13 @@ public class Phoenix3D extends PApplet {
     private final int[] texture = new int[5];
 
     private float forceFaktor = 3.0f;
+
+    private boolean userInRoom;
+
+    static public void main(String args[]) {
+        PApplet.main(new String[] { "--present", "--bgcolor=#000000", "--present-stop-color=#000000",
+                "de.haw.hamburg.inf.pro.ws11.petersenwienrich.Phoenix3D" });
+    }
 
     @Override
     public void setup() {
@@ -139,17 +158,17 @@ public class Phoenix3D extends PApplet {
 
         // initialize Processing window:
         timestamp = millis();
-        size(1024, 768, OPENGL);
+        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+        size(screen.width, screen.height, OPENGL);
         frameRate(30);
         timestamp = millis() - timestamp;
         System.out.println("Processing Setup time: " + timestamp + " ms");
 
         floorLevel = -(height + 500);
         ceiling = height + 500;
-        leftWall = -2500;
-        rightWall = 2500;
+        leftWall = -3000;
+        rightWall = 3000;
         backWall = 6000;
-        backGroundWall = 6000;
 
         backgroundImg = loadImage(IMG_RESSOURCE + "room1_backwall.jpg");
         floorImg = loadImage(IMG_RESSOURCE + "room1_floor.jpg");
@@ -254,7 +273,7 @@ public class Phoenix3D extends PApplet {
 
         timestamp = millis();
         for (int i = 0; i < NUM_PARTICLES; i++) {
-            particle[i] = new Particle3D(random(leftWall, rightWall), floorLevel, random(0, backWall), 0, 0, 0);
+            particle[i] = new Particle3D(random(leftWall, rightWall), random(floorLevel, ceiling), random(0, backWall), 0, 0, 0);
             particleBuffer.put(particle[i].x);
             particleBuffer.put(particle[i].y);
             particleBuffer.put(particle[i].z);
@@ -327,7 +346,64 @@ public class Phoenix3D extends PApplet {
     private void updateMayorMode() {
         // demo1();
         // demo2();
+        progressStory();
+    }
 
+    private void progressStory() {
+        if (phase == PHASE_0_START) {
+            if (userInRoom) {
+                phase = PHASE_1_CHAOS;
+                mayorMode = MODE_RANDOM;
+            }
+        } else if (phase == PHASE_1_CHAOS) {
+            if (moveBackCounter >= 300) {
+                mayorMode = MODE_PLANETARY;
+                phase = PHASE_2_SWARMING;
+                moveBackCounter = 0;
+                drawCount = 0;
+            } else {
+                moveBackCounter++;
+            }
+
+        } else if (phase == PHASE_2_SWARMING) {
+            if (forceFaktor < 20) {
+                forceFaktor += 0.1f;
+            } else if (forceFaktor > 0.1f) {
+                forceFaktor -= 0.1f;
+            }
+
+            if (moveBackCounter >= 1000) {
+                mayorMode = MODE_STATIC;
+                phase = PHASE_4_BEING;
+                moveBackCounter = 0;
+                drawCount = 0;
+            } else {
+                moveBackCounter++;
+            }
+        } else if (phase == PHASE_3_BUILDING) {
+
+        } else if (phase == PHASE_4_BEING) {
+            if (moveBackCounter >= 200) {
+                phase = PHASE_6_DIEING;
+                mayorMode = MODE_GRAVITY;
+                gravityMode = GRAVITY_FALLING;
+
+                moveBackCounter = 0;
+                drawCount = 0;
+            } else {
+                moveBackCounter++;
+            }
+        } else if (phase == PHASE_5_DESINTEGRATING) {
+
+        } else if (phase == PHASE_6_DIEING) {
+            if (!userInRoom || moveBackCounter >= 300) {
+                phase = PHASE_0_START;
+                moveBackCounter = 0;
+                drawCount = 0;
+            } else {
+                moveBackCounter++;
+            }
+        }
     }
 
     private void demo2() {
@@ -431,6 +507,7 @@ public class Phoenix3D extends PApplet {
         int[] userMap = null;
 
         if (userCount > 0) {
+            userInRoom = true;
             userMap = ni.getUsersPixels(SimpleOpenNI.USERS_ALL);
             userCenters = new PVector[userCount];
             // calculate mass centers
@@ -440,11 +517,13 @@ public class Phoenix3D extends PApplet {
             }
             updateComVBO(userCenters);
 
+            updateMayorMode();
+
             if (mayorMode == MODE_STATIC) {
                 drawBackground();
                 drawStaticPoints(pgl, pointCloudSteps, userMap);
             } else if (mayorMode == MODE_GRAVITY) {
-                createFreeMovingParticles(pointCloudSteps, userMap, 100);
+                createFreeMovingParticles(pointCloudSteps, userMap, 1);
                 drawBackground();
             } else if (mayorMode == MODE_WEIGHTLESS || mayorMode == MODE_NEG_WEIGHTLESS) {
                 createFreeMovingParticles(pointCloudSteps, userMap, 0);
@@ -456,9 +535,8 @@ public class Phoenix3D extends PApplet {
                 drawBackground();
             }
 
-            updateMayorMode();
-
         } else {
+            userInRoom = false;
             drawBackground();
 
         }
@@ -583,13 +661,13 @@ public class Phoenix3D extends PApplet {
             gl.glBegin(GL.GL_QUADS);
             {
                 gl.glTexCoord2f(0f, 0f);
-                gl.glVertex3f(leftWall, ceiling, backGroundWall);
+                gl.glVertex3f(leftWall, ceiling, backWall);
                 gl.glTexCoord2f(1f, 0f);
-                gl.glVertex3f(rightWall, ceiling, backGroundWall);
+                gl.glVertex3f(rightWall, ceiling, backWall);
                 gl.glTexCoord2f(1f, 1f);
-                gl.glVertex3f(rightWall, floorLevel, backGroundWall);
+                gl.glVertex3f(rightWall, floorLevel, backWall);
                 gl.glTexCoord2f(0f, 1f);
-                gl.glVertex3f(leftWall, floorLevel, backGroundWall);
+                gl.glVertex3f(leftWall, floorLevel, backWall);
             }
             gl.glEnd();
             gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
@@ -600,9 +678,9 @@ public class Phoenix3D extends PApplet {
             gl.glBegin(GL.GL_QUADS);
             {
                 gl.glTexCoord2f(0f, 0f);
-                gl.glVertex3f(leftWall, floorLevel, backGroundWall);
+                gl.glVertex3f(leftWall, floorLevel, backWall);
                 gl.glTexCoord2f(1f, 0f);
-                gl.glVertex3f(rightWall, floorLevel, backGroundWall);
+                gl.glVertex3f(rightWall, floorLevel, backWall);
                 gl.glTexCoord2f(1f, 1f);
                 gl.glVertex3f(rightWall, floorLevel, 0);
                 gl.glTexCoord2f(0f, 1f);
@@ -621,9 +699,9 @@ public class Phoenix3D extends PApplet {
                 gl.glTexCoord2f(0f, 0f);
                 gl.glVertex3f(leftWall, ceiling, 0);
                 gl.glTexCoord2f(1f, 0f);
-                gl.glVertex3f(leftWall, ceiling, backGroundWall);
+                gl.glVertex3f(leftWall, ceiling, backWall);
                 gl.glTexCoord2f(1f, 1f);
-                gl.glVertex3f(leftWall, floorLevel, backGroundWall);
+                gl.glVertex3f(leftWall, floorLevel, backWall);
                 gl.glTexCoord2f(0f, 1f);
                 gl.glVertex3f(leftWall, floorLevel, 0);
                 gl.glDisable(GL.GL_TEXTURE_2D);
@@ -637,13 +715,13 @@ public class Phoenix3D extends PApplet {
             gl.glBegin(GL.GL_QUADS);
             {
                 gl.glTexCoord2f(0f, 0f);
-                gl.glVertex3f(rightWall, ceiling, backGroundWall);
+                gl.glVertex3f(rightWall, ceiling, backWall);
                 gl.glTexCoord2f(1f, 0f);
                 gl.glVertex3f(rightWall, ceiling, 0);
                 gl.glTexCoord2f(1f, 1f);
                 gl.glVertex3f(rightWall, floorLevel, 0);
                 gl.glTexCoord2f(0f, 1f);
-                gl.glVertex3f(rightWall, floorLevel, backGroundWall);
+                gl.glVertex3f(rightWall, floorLevel, backWall);
                 gl.glDisable(GL.GL_TEXTURE_2D);
             }
             gl.glEnd();
@@ -659,9 +737,9 @@ public class Phoenix3D extends PApplet {
                 gl.glTexCoord2f(1f, 0f);
                 gl.glVertex3f(rightWall, ceiling, 0);
                 gl.glTexCoord2f(1f, 1f);
-                gl.glVertex3f(rightWall, ceiling, backGroundWall);
+                gl.glVertex3f(rightWall, ceiling, backWall);
                 gl.glTexCoord2f(0f, 1f);
-                gl.glVertex3f(leftWall, ceiling, backGroundWall);
+                gl.glVertex3f(leftWall, ceiling, backWall);
                 gl.glDisable(GL.GL_TEXTURE_2D);
             }
             gl.glEnd();
