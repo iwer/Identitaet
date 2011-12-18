@@ -366,11 +366,11 @@ public class Phoenix3D extends PApplet {
             }
 
         } else if (phase == PHASE_2_SWARMING) {
-            if (forceFaktor < 20) {
-                forceFaktor += 0.1f;
-            } else if (forceFaktor > 0.1f) {
-                forceFaktor -= 0.1f;
-            }
+            // if (forceFaktor < 20) {
+            // forceFaktor += 0.1f;
+            // } else if (forceFaktor > 0.1f) {
+            // forceFaktor -= 0.1f;
+            // }
 
             if (moveBackCounter >= 1000) {
                 mayorMode = MODE_STATIC;
