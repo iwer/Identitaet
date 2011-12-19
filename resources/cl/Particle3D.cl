@@ -229,6 +229,38 @@ __kernel void updateParticle(__global Particle3D* pIn,
     // PLANETARY MODE
 
     } else if(mode == MODE_PLANETARY) {
+
+        float dirVectX = 0;
+        float dirVectY = 0;
+        float dirVectZ = 0;
+        float dirLen = 0;
+
+        // pull to gravitation centers
+        for(int i = 0; i < 10; i++){
+            if(comIn[i].x != 0 && comIn[i].y != 0 && comIn[i].z != 0){
+				float tmpX= (comIn[i].x - pin->x);
+				float tmpY= (comIn[i].y - pin->y);
+				float tmpZ= (comIn[i].z - pin->z);
+				float tmpLen = sqrt(tmpX * tmpX + tmpY * tmpY + tmpZ *tmpZ);
+				
+				// * 1/r^2
+				dirVectX += tmpX * (1 / (tmpLen * tmpLen));
+				dirVectY += tmpY * (1 / (tmpLen * tmpLen));
+				dirVectZ += tmpZ * (1 / (tmpLen * tmpLen));
+            }
+        }
+        
+        // normalize
+        dirLen = sqrt(dirVectX * dirVectX + dirVectY * dirVectY + dirVectZ * dirVectZ);
+        dirVectX = (dirVectX / dirLen);
+        dirVectY = (dirVectY / dirLen);
+        dirVectZ = (dirVectZ / dirLen);
+
+        // velocity vector change
+        pin->velX = pin->velX + dirVectX * forceFactor;
+        pin->velY = pin->velY + dirVectY * forceFactor;
+        pin->velZ = pin->velZ + dirVectZ * forceFactor;
+
         // rightWall contact || leftWall contact
         if (((pin->x) + (pin->velX) > rightWall) ||
             ((pin->x) + (pin->velX) < leftWall)) {
@@ -246,33 +278,6 @@ __kernel void updateParticle(__global Particle3D* pIn,
             (((pin->y) + (pin->velY)) > ceiling)) {
             pin->velY = -(pin->velY) * 0.5f;
         }
-        float dirVectX = 0;
-        float dirVectY = 0;
-        float dirVectZ = 0;
-        float dirLen = 0;
-
-        // pull to gravitation centers
-        for(int i = 0; i < 10; i++){
-            if(comIn[i].x != 0 || comIn[i].y != 0 || comIn[i].z != 0){
-				float tmpX= (comIn[i].x - pin->x);
-				float tmpY= (comIn[i].y - pin->y);
-				float tmpZ= (comIn[i].z - pin->z);
-				float tmpLen = sqrt(tmpX * tmpX + tmpY * tmpY + tmpZ *tmpZ);
-				
-				dirVectX += tmpX * (1 / (tmpLen * tmpLen));
-				dirVectY += tmpY * (1 / (tmpLen * tmpLen));
-				dirVectZ += tmpZ * (1 / (tmpLen * tmpLen));
-            }
-        }
-        dirLen = sqrt(dirVectX * dirVectX + dirVectY * dirVectY + dirVectZ * dirVectZ);
-        dirVectX = (dirVectX / dirLen);
-        dirVectY = (dirVectY / dirLen);
-        dirVectZ = (dirVectZ / dirLen);
-
-        // velocity vector change
-        pin->velX = pin->velX + dirVectX * forceFactor;
-        pin->velY = pin->velY + dirVectY * forceFactor;
-        pin->velZ = pin->velZ + dirVectZ * forceFactor;
 
         // straight movement
         pin->x = (pin->x) + pin->velX;
