@@ -12,6 +12,8 @@
 #define MODE_NEG_WEIGHTLESS 3
 #define MODE_RANDOM 4
 #define MODE_PLANETARY 5
+#define MODE_PLANETARY_BUILD 6
+
 
 typedef struct{
     float x;
@@ -228,7 +230,7 @@ __kernel void updateParticle(__global Particle3D* pIn,
     //###########################################################
     // PLANETARY MODE
 
-    } else if(mode == MODE_PLANETARY) {
+    } else if(mode == MODE_PLANETARY || mode == MODE_PLANETARY_BUILD) {
 
         float dirVectX = 0;
         float dirVectY = 0;
@@ -242,6 +244,9 @@ __kernel void updateParticle(__global Particle3D* pIn,
 				float tmpY= (comIn[i].y - pin->y);
 				float tmpZ= (comIn[i].z - pin->z);
 				float tmpLen = sqrt(tmpX * tmpX + tmpY * tmpY + tmpZ *tmpZ);
+				if (tmpLen <= 200 && mode == MODE_PLANETARY_BUILD){
+					cin->a = 0;
+				}
 				
 				// * 1/r^2
 				dirVectX += tmpX * (1 / (tmpLen * tmpLen));

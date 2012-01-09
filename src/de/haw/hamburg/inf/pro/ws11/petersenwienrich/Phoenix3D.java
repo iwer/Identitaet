@@ -1,5 +1,6 @@
 package de.haw.hamburg.inf.pro.ws11.petersenwienrich;
 
+//mail@laurastolte.de -> screenshot 300dpi
 import static javax.media.opengl.GL.GL_ARRAY_BUFFER_ARB;
 import static javax.media.opengl.GL.GL_DYNAMIC_COPY_ARB;
 
@@ -28,7 +29,7 @@ public class Phoenix3D extends PApplet {
     private static final long serialVersionUID = 1L;
 
     // ParticleConstants
-    private final int NUM_PARTICLES = 1024 * 768; // 1024 * 256;
+    private final int NUM_PARTICLES = 1024 * 512;
     private final int PARTICLE_NFLOAT = 8;
     private final int PARTICLEFLOATSIZE = NUM_PARTICLES * PARTICLE_NFLOAT;
     private final int PARTICLEBYTESIZE = PARTICLEFLOATSIZE * 4;
@@ -42,7 +43,8 @@ public class Phoenix3D extends PApplet {
     private static final int MODE_NEG_WEIGHTLESS = 3;
     private static final int MODE_RANDOM = 4;
     private static final int MODE_PLANETARY = 5;
-    private static final int NMODES = 6;
+    private static final int MODE_PLANETARY_BUILD = 6;
+    private static final int NMODES = 7;
 
     private int mayorMode = MODE_GRAVITY;
 
@@ -382,6 +384,7 @@ public class Phoenix3D extends PApplet {
                 if (userInRoom) {
                     phase = PHASE_1_CHAOS;
                     mayorMode = MODE_RANDOM;
+                    drawCount = 1;
                 }
             } else if (phase == PHASE_1_CHAOS) {
                 debugText = "Phase 1";
@@ -397,19 +400,27 @@ public class Phoenix3D extends PApplet {
             } else if (phase == PHASE_2_SWARMING) {
                 debugText = "Phase 2";
                 if (moveBackCounter >= 800) {
-                    mayorMode = MODE_STATIC;
-                    phase = PHASE_4_BEING;
+                    mayorMode = MODE_PLANETARY_BUILD;
+                    phase = PHASE_3_BUILDING;
+                    pointCloudSteps = 200;
                     moveBackCounter = 0;
-                    drawCount = 0;
+                    drawCount = 1;
                 } else {
                     moveBackCounter++;
                 }
             } else if (phase == PHASE_3_BUILDING) {
                 debugText = "Phase 3";
-                // TODO: BUILDING Phase implementieren
+                if (pointCloudSteps <= 2) {
+                    phase = PHASE_4_BEING;
+                    mayorMode = MODE_STATIC;
+                    pointCloudSteps = 1;
+                    drawCount = 0;
+                } else {
+                    pointCloudSteps--;
+                }
             } else if (phase == PHASE_4_BEING) {
                 debugText = "Phase 4";
-                if (moveBackCounter >= 200) {
+                if (moveBackCounter >= 150) {
                     phase = PHASE_5_DESINTEGRATING;
                     mayorMode = MODE_WEIGHTLESS;
                     moveBackCounter = 0;
@@ -429,14 +440,15 @@ public class Phoenix3D extends PApplet {
                     howOften = 1000;
                     moveBackCounter = 0;
                     pointCloudSteps = 1000;
-                } else if (mayorMode == MODE_GRAVITY && moveBackCounter < 1000) {
+                    putAllParticlesToGround();
+                } else if (mayorMode == MODE_GRAVITY && moveBackCounter < 800) {
                     if (pointCloudSteps > 2) {
                         pointCloudSteps--;
                     } else {
-                        moveBackCounter = 1001;
+                        moveBackCounter = 801;
                     }
                     moveBackCounter++;
-                } else if (mayorMode == MODE_GRAVITY && moveBackCounter >= 1000) {
+                } else if (mayorMode == MODE_GRAVITY && moveBackCounter >= 800) {
                     moveBackCounter = 0;
                     mayorMode = MODE_GRAVITY;
                     howOften = 0;
@@ -500,6 +512,7 @@ public class Phoenix3D extends PApplet {
 
             if (mayorMode == MODE_STATIC) {
                 drawBackground();
+                putAllParticlesToGround();
                 drawStaticPoints(pgl, pointCloudSteps, userMap);
             } else if (mayorMode == MODE_GRAVITY) {
                 drawBackground();
@@ -514,8 +527,12 @@ public class Phoenix3D extends PApplet {
             } else if (mayorMode == MODE_RANDOM) {
                 makeAllParticlesRandom();
                 drawBackground();
-            } else if (mayorMode == MODE_PLANETARY) {
+            } else if (mayorMode == MODE_PLANETARY
+                    || mayorMode == MODE_PLANETARY_BUILD) {
                 drawBackground();
+                if (phase == PHASE_3_BUILDING) {
+                    drawStaticPoints(pgl, pointCloudSteps, userMap);
+                }
             }
 
         } else {
@@ -596,6 +613,23 @@ public class Phoenix3D extends PApplet {
                 tmpParticleNumber++;
             }
             drawCount++;
+        }
+    }
+
+    private void putAllParticlesToGround() {
+        if (drawCount <= 0) {
+            for (int i = 0; i < NUM_PARTICLES; i++) {
+                if (tmpParticleNumber >= NUM_PARTICLES) {
+                    tmpParticleNumber = 0;
+                }
+                particle[i].y = floorLevel;
+                particle[tmpParticleNumber].velX = 0;
+                particle[tmpParticleNumber].velY = 0;
+                particle[tmpParticleNumber].velZ = 0;
+                paintParticle(color(0, 0, 0, 0), tmpParticleNumber);
+                updateVBOParticle(tmpParticleNumber);
+                tmpParticleNumber++;
+            }
         }
     }
 
