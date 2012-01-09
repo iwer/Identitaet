@@ -90,10 +90,6 @@ __kernel void updateParticle(__global Particle3D* pIn,
                 pin->velX = 0;
                 pin->velY = 0;
                 pin->velZ = 0;
-                //cin->r = (cin->r) - 0.01f;
-                //cin->g = (cin->g) - 0.01f;
-                //cin->b = (cin->b) - 0.01f;
-                //cin->a = (cin->a) - 0.0025f;
             }
         } 
         
@@ -176,9 +172,6 @@ __kernel void updateParticle(__global Particle3D* pIn,
         }
         
         // velocity change
-//        pin->velX = pin->velX * 1.01f;
-//        pin->velY = pin->velY * 1.01f;
-//        pin->velZ = pin->velZ * 1.01f;
         pin->velX = pin->velX / 1.05f;
         pin->velY = pin->velY / 1.05f;
         pin->velZ = pin->velZ / 1.05f;
