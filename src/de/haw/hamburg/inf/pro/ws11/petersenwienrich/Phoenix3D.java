@@ -1,5 +1,6 @@
 package de.haw.hamburg.inf.pro.ws11.petersenwienrich;
 
+//mail@laurastolte.de -> screenshot 300dpi
 import static javax.media.opengl.GL.GL_ARRAY_BUFFER_ARB;
 import static javax.media.opengl.GL.GL_DYNAMIC_COPY_ARB;
 
@@ -15,7 +16,6 @@ import msa.opencl.OpenCL;
 import msa.opencl.OpenCLBuffer;
 import msa.opencl.OpenCLKernel;
 import processing.core.PApplet;
-import processing.core.PFont;
 import processing.core.PImage;
 import processing.core.PVector;
 import processing.opengl.PGraphicsOpenGL;
@@ -27,13 +27,9 @@ public class Phoenix3D extends PApplet {
 
     private static final long serialVersionUID = 1L;
 
-    // ParticleConstants
-    private final int NUM_PARTICLES = 1024 * 128; // 1024 * 256;
     private final int PARTICLE_NFLOAT = 8;
-    private final int PARTICLEFLOATSIZE = NUM_PARTICLES * PARTICLE_NFLOAT;
+    private final int PARTICLEFLOATSIZE = Config.NUM_PARTICLES * PARTICLE_NFLOAT;
     private final int PARTICLEBYTESIZE = PARTICLEFLOATSIZE * 4;
-
-    private static final int POINTSIZE = 2;
 
     // Modes
     private static final int MODE_STATIC = 0;
@@ -42,7 +38,8 @@ public class Phoenix3D extends PApplet {
     private static final int MODE_NEG_WEIGHTLESS = 3;
     private static final int MODE_RANDOM = 4;
     private static final int MODE_PLANETARY = 5;
-    private static final int NMODES = 6;
+    private static final int MODE_PLANETARY_BUILD = 6;
+    private static final int NMODES = 7;
 
     private int mayorMode = MODE_GRAVITY;
 
@@ -253,13 +250,13 @@ public class Phoenix3D extends PApplet {
 
         // init particle buffer
         timestamp = millis();
-        particle = new Particle3D[NUM_PARTICLES];
+        particle = new Particle3D[Config.NUM_PARTICLES];
         particleBytes = openCL.createByteBuffer(PARTICLEBYTESIZE);
         particleBuffer = particleBytes.asFloatBuffer();
 
         // init color buffer
-        particleColor = new int[NUM_PARTICLES];
-        colorBytes = openCL.createByteBuffer(NUM_PARTICLES * 4 * OpenCL.SIZEOF_FLOAT);
+        particleColor = new int[Config.NUM_PARTICLES];
+        colorBytes = openCL.createByteBuffer(Config.NUM_PARTICLES * 4 * OpenCL.SIZEOF_FLOAT);
         colorBuffer = colorBytes.asFloatBuffer();
 
         // init CoM Buffer
@@ -270,7 +267,7 @@ public class Phoenix3D extends PApplet {
         System.out.println("OpenCL Buffer Setup time: " + timestamp + " ms");
 
         timestamp = millis();
-        for (int i = 0; i < NUM_PARTICLES; i++) {
+        for (int i = 0; i < Config.NUM_PARTICLES; i++) {
             particle[i] = new Particle3D(random(leftWall, rightWall), random(floorLevel, ceiling), random(0, backWall), 0, 0, 0);
             particleBuffer.put(particle[i].x);
             particleBuffer.put(particle[i].y);
@@ -335,7 +332,7 @@ public class Phoenix3D extends PApplet {
         clKernel.setArg(8, mayorMode);
         clKernel.setArg(9, forceFaktor);
 
-        gl.glPointSize(POINTSIZE);
+        gl.glPointSize(Config.POINTSIZE);
         pgl.endGL();
         perspective(95, width / height, 10, 150000);
 
@@ -363,7 +360,7 @@ public class Phoenix3D extends PApplet {
                 }
             } else if (phase == PHASE_1_CHAOS) {
                 debugText = "Phase 1";
-                if (moveBackCounter >= 300) {
+                if (moveBackCounter >= Config.TIME_CHAOS) {
                     mayorMode = MODE_PLANETARY;
                     phase = PHASE_2_SWARMING;
                     moveBackCounter = 0;
@@ -374,20 +371,36 @@ public class Phoenix3D extends PApplet {
 
             } else if (phase == PHASE_2_SWARMING) {
                 debugText = "Phase 2";
-                if (moveBackCounter >= 800) {
-                    mayorMode = MODE_STATIC;
-                    phase = PHASE_4_BEING;
+                if (moveBackCounter >= Config.TIME_SWARMING) {
+                    mayorMode = MODE_PLANETARY_BUILD;
+                    phase = PHASE_3_BUILDING;
+                    pointCloudSteps = 200;
                     moveBackCounter = 0;
-                    drawCount = 0;
+                    drawCount = 1;
                 } else {
                     moveBackCounter++;
                 }
             } else if (phase == PHASE_3_BUILDING) {
                 debugText = "Phase 3";
-                // TODO: BUILDING Phase implementieren
+                if (pointCloudSteps > 500) {
+                    pointCloudSteps -= 20;
+                } else if (pointCloudSteps > 200) {
+                    pointCloudSteps -= 10;
+                } else if (pointCloudSteps > 100) {
+                    pointCloudSteps -= 5;
+                } else if (pointCloudSteps > 50) {
+                    pointCloudSteps -= 2;
+                } else if (pointCloudSteps > 2) {
+                    pointCloudSteps--;
+                } else if (pointCloudSteps <= 2) {
+                    phase = PHASE_4_BEING;
+                    mayorMode = MODE_STATIC;
+                    pointCloudSteps = 1;
+                    drawCount = 0;
+                }
             } else if (phase == PHASE_4_BEING) {
                 debugText = "Phase 4";
-                if (moveBackCounter >= 200) {
+                if (moveBackCounter >= Config.TIME_BEING) {
                     phase = PHASE_5_DESINTEGRATING;
                     mayorMode = MODE_WEIGHTLESS;
                     moveBackCounter = 0;
@@ -398,23 +411,33 @@ public class Phoenix3D extends PApplet {
                 }
             } else if (phase == PHASE_5_DESINTEGRATING) {
                 debugText = "Phase 5";
-                if (mayorMode == MODE_WEIGHTLESS && moveBackCounter >= 40) {
-                    mayorMode = MODE_NEG_WEIGHTLESS;
-                    moveBackCounter = 0;
-                } else if (mayorMode == MODE_NEG_WEIGHTLESS && moveBackCounter >= 50) {
+                if (mayorMode == MODE_WEIGHTLESS && moveBackCounter >= Config.TIME_EXPANDING) {
+                    // mayorMode = MODE_NEG_WEIGHTLESS;
+                    // moveBackCounter = 0;
+                    // drawCount = 1;
+                    // } else if (mayorMode == MODE_NEG_WEIGHTLESS &&
+                    // moveBackCounter >= Config.TIME_EXPANDING * 1.2) {
                     mayorMode = MODE_GRAVITY;
                     gravityMode = GRAVITY_FALLING;
                     howOften = 1000;
                     moveBackCounter = 0;
                     pointCloudSteps = 1000;
-                } else if (mayorMode == MODE_GRAVITY && moveBackCounter < 1000) {
-                    if (pointCloudSteps > 2) {
+                } else if (mayorMode == MODE_GRAVITY && moveBackCounter < Config.TIME_DESINTEGRATING) {
+                    if (pointCloudSteps > 500) {
+                        pointCloudSteps -= 20;
+                    } else if (pointCloudSteps > 200) {
+                        pointCloudSteps -= 10;
+                    } else if (pointCloudSteps > 100) {
+                        pointCloudSteps -= 5;
+                    } else if (pointCloudSteps > 50) {
+                        pointCloudSteps -= 2;
+                    } else if (pointCloudSteps > 2) {
                         pointCloudSteps--;
                     } else {
-                        moveBackCounter = 1001;
+                        moveBackCounter = Config.TIME_DESINTEGRATING;
                     }
                     moveBackCounter++;
-                } else if (mayorMode == MODE_GRAVITY && moveBackCounter >= 1000) {
+                } else if (mayorMode == MODE_GRAVITY && moveBackCounter >= Config.TIME_DESINTEGRATING) {
                     moveBackCounter = 0;
                     mayorMode = MODE_GRAVITY;
                     howOften = 1;
@@ -426,7 +449,7 @@ public class Phoenix3D extends PApplet {
                 }
             } else if (phase == PHASE_6_DIEING) {
                 debugText = "Phase 6";
-                if (!userInRoom || moveBackCounter >= 300) {
+                if (!userInRoom || moveBackCounter >= Config.TIME_FLOOR) {
                     phase = PHASE_0_START;
                     moveBackCounter = 0;
                     howOften = 0;
@@ -479,6 +502,7 @@ public class Phoenix3D extends PApplet {
 
             if (mayorMode == MODE_STATIC) {
                 drawBackground();
+                // putAllParticlesToGround();
                 drawStaticPoints(pgl, pointCloudSteps, userMap);
             } else if (mayorMode == MODE_GRAVITY) {
                 drawBackground();
@@ -487,13 +511,16 @@ public class Phoenix3D extends PApplet {
                 }
                 createFreeMovingParticles(pointCloudSteps, userMap, howOften);
             } else if (mayorMode == MODE_WEIGHTLESS || mayorMode == MODE_NEG_WEIGHTLESS) {
-                createFreeMovingParticles(pointCloudSteps, userMap, 0);
+                createFreeMovingParticles(pointCloudSteps, userMap, howOften);
                 drawBackground();
             } else if (mayorMode == MODE_RANDOM) {
                 makeAllParticlesRandom();
                 drawBackground();
-            } else if (mayorMode == MODE_PLANETARY) {
+            } else if (mayorMode == MODE_PLANETARY || mayorMode == MODE_PLANETARY_BUILD) {
                 drawBackground();
+                if (phase == PHASE_3_BUILDING) {
+                    drawStaticPoints(pgl, pointCloudSteps, userMap);
+                }
             }
 
         } else {
@@ -509,13 +536,13 @@ public class Phoenix3D extends PApplet {
         Update();
         Render();
 
-        drawCenterOfMass(userCenters);
-        PFont metaBold = createFont("FFScala", 88);
-
-        textFont(metaBold, 88);
-        stroke(255);
-        fill(0);
-        text(debugText + "\nUsers: " + userCount, 0, 0);
+        // drawCenterOfMass(userCenters);
+        // PFont metaBold = createFont("FFScala", 88);
+        //
+        // textFont(metaBold, 88);
+        // stroke(255);
+        // fill(0);
+        // text(debugText + "\nUsers: " + userCount, 0, 0);
         // System.out.println("FPS:" + fpsCounter.getFrequency());
     }
 
@@ -556,7 +583,7 @@ public class Phoenix3D extends PApplet {
                 // }
             }
             gl.glEnd();
-            gl.glPointSize(POINTSIZE);
+            gl.glPointSize(Config.POINTSIZE);
         }
     }
 
@@ -564,8 +591,8 @@ public class Phoenix3D extends PApplet {
 
         if (drawCount < 1) {
 
-            for (int i = 0; i < NUM_PARTICLES; i++) {
-                if (tmpParticleNumber >= NUM_PARTICLES) {
+            for (int i = 0; i < Config.NUM_PARTICLES; i++) {
+                if (tmpParticleNumber >= Config.NUM_PARTICLES) {
                     tmpParticleNumber = 0;
                 }
                 particle[tmpParticleNumber].y = floorLevel;
@@ -578,6 +605,23 @@ public class Phoenix3D extends PApplet {
                 tmpParticleNumber++;
             }
             drawCount++;
+        }
+    }
+
+    private void putAllParticlesToGround() {
+        if (drawCount <= 0) {
+            for (int i = 0; i < Config.NUM_PARTICLES; i++) {
+                if (tmpParticleNumber >= Config.NUM_PARTICLES) {
+                    tmpParticleNumber = 0;
+                }
+                particle[i].y = floorLevel;
+                particle[tmpParticleNumber].velX = 0;
+                particle[tmpParticleNumber].velY = 0;
+                particle[tmpParticleNumber].velZ = 0;
+                paintParticle(color(0, 0, 0, 0), tmpParticleNumber);
+                updateVBOParticle(tmpParticleNumber);
+                tmpParticleNumber++;
+            }
         }
     }
 
@@ -601,7 +645,7 @@ public class Phoenix3D extends PApplet {
     }
 
     public void createGravityParticle(float x, float y, float z, int realX, int realY) {
-        if (tmpParticleNumber >= NUM_PARTICLES) {
+        if (tmpParticleNumber >= Config.NUM_PARTICLES) {
             tmpParticleNumber = 0;
         }
         createGravityParticle(x, y, z, realX, realY, tmpParticleNumber);
@@ -821,7 +865,7 @@ public class Phoenix3D extends PApplet {
             gl.glPushMatrix();
             gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
             gl.glVertexPointer(3, GL.GL_FLOAT, 32, 0);
-            gl.glDrawArrays(GL.GL_POINTS, 0, NUM_PARTICLES);
+            gl.glDrawArrays(GL.GL_POINTS, 0, Config.NUM_PARTICLES);
             gl.glBindBufferARB(GL.GL_ARRAY_BUFFER_ARB, 0);
             gl.glDisableClientState(GL.GL_VERTEX_ARRAY);
             gl.glDisableClientState(GL.GL_COLOR_ARRAY);
@@ -854,7 +898,7 @@ public class Phoenix3D extends PApplet {
             clKernel.setArg(7, backWall);
             clKernel.setArg(8, mayorMode);
 
-            clKernel.run1D(NUM_PARTICLES, (int) wgs);
+            clKernel.run1D(Config.NUM_PARTICLES, (int) wgs);
         } catch (Throwable ex) {
             ex.printStackTrace();
             System.exit(1);
@@ -863,7 +907,7 @@ public class Phoenix3D extends PApplet {
         clMemParticles.read(particleBytes, 0, PARTICLEBYTESIZE, true);
         particleBuffer = particleBytes.asFloatBuffer();
 
-        clMemColors.read(colorBytes, 0, NUM_PARTICLES * 4 * 4, true);
+        clMemColors.read(colorBytes, 0, Config.NUM_PARTICLES * 4 * 4, true);
         colorBuffer = colorBytes.asFloatBuffer();
 
         openCL.releaseGLObjects();

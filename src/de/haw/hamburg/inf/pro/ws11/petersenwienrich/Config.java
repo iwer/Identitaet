@@ -23,4 +23,21 @@ public class Config {
     // "resources\\cl\\";
     public static final String CL_LOCATION = PROJECT_HOME + "resources/cl/";
 
+    // ParticleConstants
+    public final static int NUM_PARTICLES = 1024 * 128; // 1024 * 256;
+
+    public static final int POINTSIZE = 3;
+
+    public static final int TIME_CHAOS = 200;
+
+    public static final int TIME_SWARMING = 1000;
+
+    public static final int TIME_BEING = 150;
+
+    public static final int TIME_EXPANDING = 60;
+
+    public static final int TIME_DESINTEGRATING = 800;
+
+    public static final int TIME_FLOOR = 300;
+
 }

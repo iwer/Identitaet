@@ -7,11 +7,14 @@
 #define GRAVITY -0.981f
 #define DELTATIME 2.0f
 
+#define MODE_STATIC 0
 #define MODE_GRAVITY 1
 #define MODE_WEIGHTLESS 2
 #define MODE_NEG_WEIGHTLESS 3
 #define MODE_RANDOM 4
 #define MODE_PLANETARY 5
+#define MODE_PLANETARY_BUILD 6
+
 
 typedef struct{
     float x;
@@ -58,8 +61,27 @@ __kernel void updateParticle(__global Particle3D* pIn,
 
     //###########################################################
     // GRAVITY MODE
-    
-    if(mode == MODE_GRAVITY) {
+    if(mode == MODE_STATIC) {
+        for(int i = 0; i < 10; i++){
+                    if(comIn[i].x != 0 && comIn[i].y != 0 && comIn[i].z != 0){
+                        float tmpX= (comIn[i].x - pin->x);
+                        float tmpY= (comIn[i].y - pin->y);
+                        float tmpZ= (comIn[i].z - pin->z);
+                        float tmpLen = sqrt(tmpX * tmpX + tmpY * tmpY + tmpZ *tmpZ);
+                        if (tmpLen <= 400 && mode == MODE_PLANETARY_BUILD){
+                            pin->y = floor;
+                            cin->a = 0;
+                        }
+                    }
+        }
+        // straight movement
+        pin->x = (pin->x) + pin->velX;
+        pin->y = (pin->y) + pin->velY;
+        pin->z = (pin->z) + pin->velZ;
+
+        // velocity change
+        pin->velY = pin->velY + diffSpeedY;
+    } else if(mode == MODE_GRAVITY) {
         if(pin->dir == 1) {
             pin->dir = 0;
         }
@@ -88,10 +110,6 @@ __kernel void updateParticle(__global Particle3D* pIn,
                 pin->velX = 0;
                 pin->velY = 0;
                 pin->velZ = 0;
-                //cin->r = (cin->r) - 0.01f;
-                //cin->g = (cin->g) - 0.01f;
-                //cin->b = (cin->b) - 0.01f;
-                //cin->a = (cin->a) - 0.0025f;
             }
         } 
         
@@ -174,9 +192,6 @@ __kernel void updateParticle(__global Particle3D* pIn,
         }
         
         // velocity change
-//        pin->velX = pin->velX * 1.01f;
-//        pin->velY = pin->velY * 1.01f;
-//        pin->velZ = pin->velZ * 1.01f;
         pin->velX = pin->velX / 1.05f;
         pin->velY = pin->velY / 1.05f;
         pin->velZ = pin->velZ / 1.05f;
@@ -228,7 +243,7 @@ __kernel void updateParticle(__global Particle3D* pIn,
     //###########################################################
     // PLANETARY MODE
 
-    } else if(mode == MODE_PLANETARY) {
+    } else if(mode == MODE_PLANETARY || mode == MODE_PLANETARY_BUILD) {
 
         float dirVectX = 0;
         float dirVectY = 0;
@@ -242,6 +257,9 @@ __kernel void updateParticle(__global Particle3D* pIn,
 				float tmpY= (comIn[i].y - pin->y);
 				float tmpZ= (comIn[i].z - pin->z);
 				float tmpLen = sqrt(tmpX * tmpX + tmpY * tmpY + tmpZ *tmpZ);
+				if (tmpLen <= 400 && mode == MODE_PLANETARY_BUILD){
+					cin->a = 0;
+				}
 				
 				// * 1/r^2
 				dirVectX += tmpX * (1 / (tmpLen * tmpLen));
