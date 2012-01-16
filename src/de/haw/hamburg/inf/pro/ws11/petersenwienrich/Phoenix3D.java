@@ -437,11 +437,11 @@ public class Phoenix3D extends PApplet {
                 debugText = "Phase 5";
                 if (mayorMode == MODE_WEIGHTLESS
                         && moveBackCounter >= Config.TIME_EXPANDING) {
-                    mayorMode = MODE_NEG_WEIGHTLESS;
-                    moveBackCounter = 0;
+                    // mayorMode = MODE_NEG_WEIGHTLESS;
+                    // moveBackCounter = 0;
                     drawCount = 1;
-                } else if (mayorMode == MODE_NEG_WEIGHTLESS
-                        && moveBackCounter >= Config.TIME_EXPANDING * 0.5) {
+                    // } else if (mayorMode == MODE_NEG_WEIGHTLESS
+                    // && moveBackCounter >= Config.TIME_EXPANDING * 0.5) {
                     mayorMode = MODE_GRAVITY;
                     gravityMode = GRAVITY_FALLING;
                     howOften = 1000;

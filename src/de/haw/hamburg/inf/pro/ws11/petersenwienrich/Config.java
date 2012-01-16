@@ -28,7 +28,7 @@ public class Config {
 
     public static final int POINTSIZE = 3;
 
-    public static final int TIME_CHAOS = 200;
+    public static final int TIME_CHAOS = 400;
 
     public static final int TIME_SWARMING = 1000;
 
@@ -38,6 +38,6 @@ public class Config {
 
     public static final int TIME_DESINTEGRATING = 800;
 
-    public static final int TIME_FLOOR = 300;
+    public static final int TIME_FLOOR = 600;
 
 }

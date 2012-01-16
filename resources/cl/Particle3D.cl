@@ -60,7 +60,7 @@ __kernel void updateParticle(__global Particle3D* pIn,
     float diffSpeedY = GRAVITY * DELTATIME;
 
     //###########################################################
-    // GRAVITY MODE
+    // STATIC MODE
     if(mode == MODE_STATIC) {
         for(int i = 0; i < 10; i++){
                     if(comIn[i].x != 0 && comIn[i].y != 0 && comIn[i].z != 0){
@@ -69,11 +69,41 @@ __kernel void updateParticle(__global Particle3D* pIn,
                         float tmpZ= (comIn[i].z - pin->z);
                         float tmpLen = sqrt(tmpX * tmpX + tmpY * tmpY + tmpZ *tmpZ);
                         if (tmpLen <= 400 && mode == MODE_PLANETARY_BUILD){
-                            pin->y = floor;
                             cin->a = 0;
                         }
                     }
         }
+        
+        // rightWall contact || leftWall contact
+        if (((pin->x) + (pin->velX) > rightWall) ||
+            ((pin->x) + (pin->velX) < leftWall)) {
+            pin->velX = -(pin->velX);
+        }
+    
+        // backWall contact || frontWall contact
+        if (((pin->z) + (pin->velZ) > backWall) ||
+            ((pin->z) + (pin->velZ) < 0)) {
+            pin->velZ = -(pin->velZ);
+        }
+
+        // floor contact flips and damps Z velocity
+        if((pin->y) + (pin->velY) < floor) {
+            pin->velX = (pin->velX) * 0.8f;
+            pin->velY = -(pin->velY) * 0.10f;
+            pin->velZ = (pin->velZ) * 0.8f;
+            
+            pin->y = pin->y + pin->velY;
+            
+            // fade out if too slow and near floor
+            if(((pin->velY) < 0.6f) && (pin->y) < (floor + 2)) {
+                pin->velX = 0;
+                pin->velY = 0;
+                pin->velZ = 0;
+                pin->y = floor;
+                
+            }
+        }
+        
         // straight movement
         pin->x = (pin->x) + pin->velX;
         pin->y = (pin->y) + pin->velY;
@@ -81,6 +111,8 @@ __kernel void updateParticle(__global Particle3D* pIn,
 
         // velocity change
         pin->velY = pin->velY + diffSpeedY;
+    //###########################################################
+    // GRAVITY MODE
     } else if(mode == MODE_GRAVITY) {
         if(pin->dir == 1) {
             pin->dir = 0;
@@ -257,7 +289,7 @@ __kernel void updateParticle(__global Particle3D* pIn,
 				float tmpY= (comIn[i].y - pin->y);
 				float tmpZ= (comIn[i].z - pin->z);
 				float tmpLen = sqrt(tmpX * tmpX + tmpY * tmpY + tmpZ *tmpZ);
-				if (tmpLen <= 400 && mode == MODE_PLANETARY_BUILD){
+				if (tmpLen <= 600 && mode == MODE_PLANETARY_BUILD){
 					cin->a = 0;
 				}
 				
