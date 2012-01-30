@@ -11,7 +11,6 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
 
 import msa.opencl.OpenCL;
 import msa.opencl.OpenCLBuffer;
@@ -67,7 +66,6 @@ public class Phoenix3D extends PApplet {
     private OpenCL openCL;
     private PGraphicsOpenGL pgl;
     private GL gl;
-    private GLU glu;
     private OpenCLKernel clKernel;
 
     // FrameCounter
@@ -235,8 +233,6 @@ public class Phoenix3D extends PApplet {
         gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, ceilImg.width, ceilImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
                 IntBuffer.wrap(ceilImg.pixels));
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
-
-        glu = new GLU();
 
         timestamp = millis() - timestamp;
         System.out.println("OpenGL Setup time: " + timestamp + " ms");
