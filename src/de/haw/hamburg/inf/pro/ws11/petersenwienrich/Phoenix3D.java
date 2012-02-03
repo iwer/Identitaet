@@ -429,18 +429,16 @@ public class Phoenix3D extends PApplet {
                         pointCloudSteps -= 5;
                     } else if (pointCloudSteps > 100) {
                         pointCloudSteps -= 2;
-                        // } else if (pointCloudSteps > 50) {
-                        // pointCloudSteps -= 2;
                     } else if (pointCloudSteps > 2) {
                         pointCloudSteps--;
                     } else {
                         moveBackCounter = Config.TIME_DESINTEGRATING;
+                        howOften = 1;
                     }
                     moveBackCounter++;
                 } else if (mayorMode == MODE_GRAVITY && moveBackCounter >= Config.TIME_DESINTEGRATING) {
                     moveBackCounter = 0;
                     mayorMode = MODE_GRAVITY;
-                    howOften = 1;
                     pointCloudSteps = 2;
                     phase = PHASE_6_DIEING;
                     drawCount = 0;
@@ -679,9 +677,9 @@ public class Phoenix3D extends PApplet {
             // explode mode
             float a = random(0, 180);
             float b = random(0, 360);
-            particle[particleNumber].velX = 50 * sin(a) * cos(b);
-            particle[particleNumber].velY = 50 * cos(a);
-            particle[particleNumber].velZ = 50 * sin(a) * sin(b);
+            particle[particleNumber].velX = 20 * sin(a) * cos(b);
+            particle[particleNumber].velY = 20 * cos(a);
+            particle[particleNumber].velZ = 20 * sin(a) * sin(b);
         }
         updateParticleToVBO(particleNumber);
         paintParticle(realX, realY, particleNumber);
