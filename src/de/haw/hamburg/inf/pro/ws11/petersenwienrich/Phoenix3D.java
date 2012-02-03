@@ -139,8 +139,7 @@ public class Phoenix3D extends PApplet {
     String debugText = "";
 
     static public void main(String args[]) {
-        PApplet.main(new String[] { "--present", "--bgcolor=#000000", "--present-stop-color=#000000",
-                "de.haw.hamburg.inf.pro.ws11.petersenwienrich.Phoenix3D" });
+        PApplet.main(new String[] { "--present", "--bgcolor=#000000", "--present-stop-color=#000000", "de.haw.hamburg.inf.pro.ws11.petersenwienrich.Phoenix3D" });
     }
 
     @Override
@@ -194,8 +193,7 @@ public class Phoenix3D extends PApplet {
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
-        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, backgroundImg.width, backgroundImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
-                IntBuffer.wrap(backgroundImg.pixels));
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, backgroundImg.width, backgroundImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE, IntBuffer.wrap(backgroundImg.pixels));
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
         // #####
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture[1]);
@@ -203,8 +201,7 @@ public class Phoenix3D extends PApplet {
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
-        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, floorImg.width, floorImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
-                IntBuffer.wrap(floorImg.pixels));
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, floorImg.width, floorImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE, IntBuffer.wrap(floorImg.pixels));
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
         // #####
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture[2]);
@@ -212,8 +209,7 @@ public class Phoenix3D extends PApplet {
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
-        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, lWallImg.width, lWallImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
-                IntBuffer.wrap(lWallImg.pixels));
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, lWallImg.width, lWallImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE, IntBuffer.wrap(lWallImg.pixels));
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
         // #####
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture[3]);
@@ -221,8 +217,7 @@ public class Phoenix3D extends PApplet {
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
-        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, rWallImg.width, rWallImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
-                IntBuffer.wrap(rWallImg.pixels));
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, rWallImg.width, rWallImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE, IntBuffer.wrap(rWallImg.pixels));
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
         // #####
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture[4]);
@@ -230,8 +225,7 @@ public class Phoenix3D extends PApplet {
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
-        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, ceilImg.width, ceilImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
-                IntBuffer.wrap(ceilImg.pixels));
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, ceilImg.width, ceilImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE, IntBuffer.wrap(ceilImg.pixels));
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
 
         timestamp = millis() - timestamp;
@@ -267,6 +261,30 @@ public class Phoenix3D extends PApplet {
         System.out.println("OpenCL Buffer Setup time: " + timestamp + " ms");
 
         timestamp = millis();
+
+        int initialParticleColor = 0;
+
+        switch (Config.COLOR_MODE) {
+        case Config.COLOR_FULL:
+            initialParticleColor = 255;
+            break;
+        case Config.COLOR_WHITE_ON_BLACK:
+            initialParticleColor = 255;
+            break;
+        case Config.COLOR_WHITE_ON_GREY:
+            initialParticleColor = 255;
+            break;
+        case Config.COLOR_WHITE_ON_WHITE:
+            initialParticleColor = 255;
+            break;
+        case Config.COLOR_DUST:
+            initialParticleColor = 128;
+            break;
+        default:
+            initialParticleColor = 255;
+            break;
+        }
+
         for (int i = 0; i < Config.NUM_PARTICLES; i++) {
             particle[i] = new Particle3D(random(leftWall, rightWall), random(floorLevel, ceiling), random(0, backWall), 0, 0, 0);
             particleBuffer.put(particle[i].x);
@@ -275,7 +293,7 @@ public class Phoenix3D extends PApplet {
             particleBuffer.put(particle[i].velX);
             particleBuffer.put(particle[i].velY);
             particleBuffer.put(particle[i].velZ);
-            particleColor[i] = color(255);
+            particleColor[i] = color(initialParticleColor);
             colorBuffer.put(red(particleColor[i]));
             colorBuffer.put(green(particleColor[i]));
             colorBuffer.put(blue(particleColor[i]));
@@ -467,7 +485,26 @@ public class Phoenix3D extends PApplet {
         PGraphicsOpenGL pgl = (PGraphicsOpenGL) g;
         ni.update();
 
-        background(0);
+        switch (Config.COLOR_MODE) {
+        case Config.COLOR_FULL:
+            background(0);
+            break;
+        case Config.COLOR_WHITE_ON_BLACK:
+            background(0);
+            break;
+        case Config.COLOR_WHITE_ON_GREY:
+            background(128);
+            break;
+        case Config.COLOR_WHITE_ON_WHITE:
+            background(230);
+            break;
+        case Config.COLOR_DUST:
+            background(0);
+            break;
+        default:
+            background(0);
+            break;
+        }
 
         fpsCounter.triggerCount();
 
@@ -642,8 +679,7 @@ public class Phoenix3D extends PApplet {
                     int y = (i - x) / ni.depthWidth();
                     // check if there is a user
                     if (userMap[i] != 0) {
-                        createGravityParticle(realWorldPoint.x + random(-2, 2), realWorldPoint.y + random(-2, 2), realWorldPoint.z
-                                + random(-2, 2), x, y);
+                        createGravityParticle(realWorldPoint.x + random(-2, 2), realWorldPoint.y + random(-2, 2), realWorldPoint.z + random(-2, 2), x, y);
                     }
                 }
             }
@@ -699,8 +735,7 @@ public class Phoenix3D extends PApplet {
                 int y = (i - x) / ni.depthWidth();
                 // check if there is a user
                 if (userMap[i] != 0) {
-                    gl.glColor3f(norm(red(rgbImg.get(x, y)), 0, 255), norm(green(rgbImg.get(x, y)), 0, 255),
-                            norm(blue(rgbImg.get(x, y)), 0, 255));
+                    gl.glColor3f(norm(red(rgbImg.get(x, y)), 0, 255), norm(green(rgbImg.get(x, y)), 0, 255), norm(blue(rgbImg.get(x, y)), 0, 255));
                     gl.glVertex3f(realWorldPoint.x, realWorldPoint.y, realWorldPoint.z);
                 }
             }
@@ -712,7 +747,27 @@ public class Phoenix3D extends PApplet {
     }
 
     private void paintParticle(int realX, int realY, int particleNumber) {
-        paintParticle(rgbImg.get(realX, realY), particleNumber);
+        switch (Config.COLOR_MODE) {
+        case Config.COLOR_FULL:
+            paintParticle(rgbImg.get(realX, realY), particleNumber);
+            break;
+        case Config.COLOR_WHITE_ON_BLACK:
+            paintParticle(255, particleNumber);
+            break;
+        case Config.COLOR_WHITE_ON_GREY:
+            paintParticle(255, particleNumber);
+            break;
+        case Config.COLOR_WHITE_ON_WHITE:
+            paintParticle(255, particleNumber);
+            break;
+        case Config.COLOR_DUST:
+            paintParticle(128, particleNumber);
+            break;
+        default:
+            paintParticle(rgbImg.get(realX, realY), particleNumber);
+            break;
+        }
+
     }
 
     private void paintParticle(int color, int particleNumber) {
