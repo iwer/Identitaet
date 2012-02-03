@@ -13,7 +13,8 @@ public class Config {
 
     /* ########################################################### */
 
-    public static final String IMAGES_LOCATION = PROJECT_HOME + "resources\\images\\";
+    public static final String IMAGES_LOCATION = PROJECT_HOME
+            + "resources\\images\\";
     // public static final String IMAGES_LOCATION = PROJECT_HOME +
     // "resources/images/";
 
@@ -35,7 +36,8 @@ public class Config {
 
     /* ########################################################### */
     // ParticleConstants
-    public final static int NUM_PARTICLES = 1024 * 128;
+
+    public final static int NUM_PARTICLES = 1024 * 396;
 
     public static final int POINTSIZE = 3;
 
