@@ -194,8 +194,8 @@ public class Phoenix3D extends PApplet {
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
-        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, backgroundImg.width, backgroundImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
-                IntBuffer.wrap(backgroundImg.pixels));
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, backgroundImg.width, backgroundImg.height, 0, GL.GL_BGRA,
+                GL.GL_UNSIGNED_BYTE, IntBuffer.wrap(backgroundImg.pixels));
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
         // #####
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture[1]);
@@ -203,8 +203,8 @@ public class Phoenix3D extends PApplet {
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
-        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, floorImg.width, floorImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
-                IntBuffer.wrap(floorImg.pixels));
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, floorImg.width, floorImg.height, 0, GL.GL_BGRA,
+                GL.GL_UNSIGNED_BYTE, IntBuffer.wrap(floorImg.pixels));
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
         // #####
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture[2]);
@@ -212,8 +212,8 @@ public class Phoenix3D extends PApplet {
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
-        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, lWallImg.width, lWallImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
-                IntBuffer.wrap(lWallImg.pixels));
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, lWallImg.width, lWallImg.height, 0, GL.GL_BGRA,
+                GL.GL_UNSIGNED_BYTE, IntBuffer.wrap(lWallImg.pixels));
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
         // #####
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture[3]);
@@ -221,8 +221,8 @@ public class Phoenix3D extends PApplet {
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
-        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, rWallImg.width, rWallImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
-                IntBuffer.wrap(rWallImg.pixels));
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, rWallImg.width, rWallImg.height, 0, GL.GL_BGRA,
+                GL.GL_UNSIGNED_BYTE, IntBuffer.wrap(rWallImg.pixels));
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
         // #####
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture[4]);
@@ -230,8 +230,8 @@ public class Phoenix3D extends PApplet {
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
-        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, ceilImg.width, ceilImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
-                IntBuffer.wrap(ceilImg.pixels));
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, ceilImg.width, ceilImg.height, 0, GL.GL_BGRA,
+                GL.GL_UNSIGNED_BYTE, IntBuffer.wrap(ceilImg.pixels));
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
 
         timestamp = millis() - timestamp;
@@ -292,7 +292,8 @@ public class Phoenix3D extends PApplet {
         }
 
         for (int i = 0; i < Config.NUM_PARTICLES; i++) {
-            particle[i] = new Particle3D(random(leftWall, rightWall), random(floorLevel, ceiling), random(0, backWall), 0, 0, 0);
+            particle[i] = new Particle3D(random(leftWall, rightWall), random(floorLevel, ceiling), random(0, backWall),
+                    0, 0, 0);
             particleBuffer.put(particle[i].x);
             particleBuffer.put(particle[i].y);
             particleBuffer.put(particle[i].z);
@@ -700,8 +701,8 @@ public class Phoenix3D extends PApplet {
                     int y = (i - x) / ni.depthWidth();
                     // check if there is a user
                     if (userMap[i] != 0) {
-                        createGravityParticle(realWorldPoint.x + random(-2, 2), realWorldPoint.y + random(-2, 2), realWorldPoint.z
-                                + random(-2, 2), x, y);
+                        createGravityParticle(realWorldPoint.x + random(-2, 2), realWorldPoint.y + random(-2, 2),
+                                realWorldPoint.z + random(-2, 2), x, y);
                     }
                 }
             }
@@ -747,8 +748,7 @@ public class Phoenix3D extends PApplet {
 
     private void drawStaticPoints(PGraphicsOpenGL pgl, int pointCloudSteps, int[] userMap) {
         /*
-         * TODO: Try building form bottom to top, increase heightToDraw in
-         * progressStory starting from floorlevel
+         * TODO: Try building form bottom to top, increase heightToDraw in progressStory starting from floorlevel
          */
         PVector realWorldPoint;
         if (userMap != null) {
@@ -759,7 +759,7 @@ public class Phoenix3D extends PApplet {
                 realWorldPoint = ni.depthMapRealWorld()[i];
                 int x = i % ni.depthWidth();
                 int y = (i - x) / ni.depthWidth();
-                // check if point is higher than heightToDraw
+                // TODO:check if point is higher than heightToDraw
                 // if (y > heightToDraw) {
                 // break;
                 // }
