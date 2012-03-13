@@ -136,6 +136,8 @@ public class Phoenix3D extends PApplet {
     private int pointCloudSteps = 2;
     private int howOften = 0;
 
+    private int heightToDraw;
+
     String debugText = "";
 
     static public void main(String args[]) {
@@ -170,6 +172,8 @@ public class Phoenix3D extends PApplet {
         leftWall = -3000;
         rightWall = 3000;
         backWall = 6000;
+
+        heightToDraw = 0;
 
         backgroundImg = loadImage(IMG_RESSOURCE + "room1_backwall.jpg");
         floorImg = loadImage(IMG_RESSOURCE + "room1_floor.jpg");
@@ -399,36 +403,51 @@ public class Phoenix3D extends PApplet {
                 if (moveBackCounter >= Config.TIME_SWARMING) {
                     mayorMode = MODE_PLANETARY_BUILD;
                     phase = PHASE_3_BUILDING;
-                    pointCloudSteps = 200;
+                    // pointCloudSteps = 200;
+                    pointCloudSteps = 2;
                     moveBackCounter = 0;
                     drawCount = 1;
+                    heightToDraw = 0;
                 } else {
                     moveBackCounter++;
                 }
             } else if (phase == PHASE_3_BUILDING) {
                 debugText = "Phase 3";
-                if (pointCloudSteps > 500) {
-                    pointCloudSteps -= 20;
+                // TODO: NEW METHOD
+                if (heightToDraw < ni.depthHeight()) {
+                    heightToDraw++;
                     forceFaktor++;
-                } else if (pointCloudSteps > 200) {
-                    pointCloudSteps -= 10;
-                    forceFaktor++;
-                } else if (pointCloudSteps > 100) {
-                    pointCloudSteps -= 5;
-                    forceFaktor++;
-                } else if (pointCloudSteps > 50) {
-                    pointCloudSteps -= 2;
-                    forceFaktor++;
-                } else if (pointCloudSteps > 2) {
-                    pointCloudSteps--;
-                    forceFaktor++;
-                } else if (pointCloudSteps <= 2) {
+                } else {
                     phase = PHASE_4_BEING;
                     mayorMode = MODE_STATIC;
-                    pointCloudSteps = 1;
+                    pointCloudSteps = 2;
                     drawCount = 0;
                     forceFaktor = 3.0f;
                 }
+                // ##############################################
+                // OLD METHOD OF BUILDING
+                // if (pointCloudSteps > 500) {
+                // pointCloudSteps -= 20;
+                // forceFaktor++;
+                // } else if (pointCloudSteps > 200) {
+                // pointCloudSteps -= 10;
+                // forceFaktor++;
+                // } else if (pointCloudSteps > 100) {
+                // pointCloudSteps -= 5;
+                // forceFaktor++;
+                // } else if (pointCloudSteps > 50) {
+                // pointCloudSteps -= 2;
+                // forceFaktor++;
+                // } else if (pointCloudSteps > 2) {
+                // pointCloudSteps--;
+                // forceFaktor++;
+                // } else if (pointCloudSteps <= 2) {
+                // phase = PHASE_4_BEING;
+                // mayorMode = MODE_STATIC;
+                // pointCloudSteps = 1;
+                // drawCount = 0;
+                // forceFaktor = 3.0f;
+                // }
             } else if (phase == PHASE_4_BEING) {
                 debugText = "Phase 4";
                 if (moveBackCounter >= Config.TIME_BEING) {
@@ -760,9 +779,9 @@ public class Phoenix3D extends PApplet {
                 int x = i % ni.depthWidth();
                 int y = (i - x) / ni.depthWidth();
                 // TODO:check if point is higher than heightToDraw
-                // if (y > heightToDraw) {
-                // break;
-                // }
+                if ((ni.depthHeight() - y) > heightToDraw) {
+                    break;
+                }
                 // check if there is a user
                 if (userMap[i] != 0) {
                     switch (Config.COLOR_MODE) {
