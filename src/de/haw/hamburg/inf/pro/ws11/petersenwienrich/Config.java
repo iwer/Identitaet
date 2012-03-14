@@ -9,6 +9,7 @@ public class Config {
     // private static final String PROJECT_HOME = "C:\\Users\\Umbriel\\workspace\\Phoenix3D\\";
 
     private static final String PROJECT_HOME = "C:\\Users\\elresidente\\git\\interactive-installations-phoenix3d\\";
+
     // private static final String PROJECT_HOME =
     // "/home/elresidente/Develop/Repository/interactive-installations-phoenix3d/";
 
@@ -34,13 +35,20 @@ public class Config {
     public static final int COLOR_MODE = COLOR_FULL;
 
     /* ########################################################### */
+    // Room Mode Constants
+    public static final int ROOM_SHABY = 300;
+    public static final int ROOM_WHITE = 301;
+
+    public static final int ROOM_MODE = ROOM_WHITE;
+
+    /* ########################################################### */
     // ParticleConstants
 
-    public final static int NUM_PARTICLES = 1024 * 396;
+    public final static int NUM_PARTICLES = 1024 * 256;
 
     public static final int POINTSIZE = 3;
 
-    public static final int TIME_CHAOS = 400;
+    public static final int TIME_CHAOS = 125;
 
     public static final int TIME_SWARMING = 1000;
 

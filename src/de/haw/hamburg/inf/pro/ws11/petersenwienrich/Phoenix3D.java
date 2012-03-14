@@ -100,7 +100,6 @@ public class Phoenix3D extends PApplet {
     // the x-axis,
     // the data from openni comes upside down
     private float camRotY = radians(0);
-    private float camRotTick;
 
     // Moved Particle Counter
     private int tmpParticleNumber;
@@ -136,9 +135,13 @@ public class Phoenix3D extends PApplet {
     private int pointCloudSteps = 2;
     private int howOften = 0;
 
-    private int heightToDraw;
+    private float heightToDraw;
 
     String debugText = "";
+
+    private float maxHeightToDraw;
+
+    private float maxUserHeight;
 
     static public void main(String args[]) {
         PApplet.main(new String[] { "--present", "--bgcolor=#000000", "--present-stop-color=#000000",
@@ -163,7 +166,7 @@ public class Phoenix3D extends PApplet {
         timestamp = millis();
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         size(screen.width, screen.height, OPENGL);
-        frameRate(30);
+        frameRate(25);
         timestamp = millis() - timestamp;
         System.out.println("Processing Setup time: " + timestamp + " ms");
 
@@ -172,14 +175,23 @@ public class Phoenix3D extends PApplet {
         leftWall = -3000;
         rightWall = 3000;
         backWall = 6000;
+        heightToDraw = floorLevel + 0.5f;
+        maxHeightToDraw = ceiling;
+        maxUserHeight = floorLevel + 0.5f;
 
-        heightToDraw = 0;
-
-        backgroundImg = loadImage(IMG_RESSOURCE + "room1_backwall.jpg");
-        floorImg = loadImage(IMG_RESSOURCE + "room1_floor.jpg");
-        lWallImg = loadImage(IMG_RESSOURCE + "room1_left_wall.jpg");
-        rWallImg = loadImage(IMG_RESSOURCE + "room1_right_wall.jpg");
-        ceilImg = loadImage(IMG_RESSOURCE + "room1_ceiling.jpg");
+        if (Config.ROOM_MODE == Config.ROOM_SHABY) {
+            backgroundImg = loadImage(IMG_RESSOURCE + "room1_backwall.jpg");
+            floorImg = loadImage(IMG_RESSOURCE + "room1_floor.jpg");
+            lWallImg = loadImage(IMG_RESSOURCE + "room1_left_wall.jpg");
+            rWallImg = loadImage(IMG_RESSOURCE + "room1_right_wall.jpg");
+            ceilImg = loadImage(IMG_RESSOURCE + "room1_ceiling.jpg");
+        } else if (Config.ROOM_MODE == Config.ROOM_WHITE) {
+            backgroundImg = loadImage(IMG_RESSOURCE + "white_back.jpg");
+            floorImg = loadImage(IMG_RESSOURCE + "white_floor.jpg");
+            lWallImg = loadImage(IMG_RESSOURCE + "white_left.jpg");
+            rWallImg = loadImage(IMG_RESSOURCE + "white_right.jpg");
+            ceilImg = loadImage(IMG_RESSOURCE + "white_ceiling.jpg");
+        }
 
         // initialize GL object
         timestamp = millis();
@@ -276,7 +288,7 @@ public class Phoenix3D extends PApplet {
 
         switch (Config.COLOR_MODE) {
         case Config.COLOR_FULL:
-            initialParticleColor = 255;
+            initialParticleColor = 0;
             break;
         case Config.COLOR_WHITE_ON_BLACK:
             initialParticleColor = 255;
@@ -296,8 +308,9 @@ public class Phoenix3D extends PApplet {
         }
 
         for (int i = 0; i < Config.NUM_PARTICLES; i++) {
-            particle[i] = new Particle3D(random(leftWall, rightWall), random(floorLevel, ceiling), random(0, backWall),
-                    0, 0, 0);
+            // particle[i] = new Particle3D(random(leftWall, rightWall), random(
+            // floorLevel, ceiling), random(0, backWall), 0, 0, 0);
+            particle[i] = new Particle3D(0, floorLevel, backWall / 2, 0, 0, 0);
             particleBuffer.put(particle[i].x);
             particleBuffer.put(particle[i].y);
             particleBuffer.put(particle[i].z);
@@ -407,22 +420,27 @@ public class Phoenix3D extends PApplet {
                     pointCloudSteps = 2;
                     moveBackCounter = 0;
                     drawCount = 1;
-                    heightToDraw = 0;
+                    heightToDraw = floorLevel + 0.5f;
+                    maxUserHeight = floorLevel + 20.5f;
                 } else {
                     moveBackCounter++;
                 }
             } else if (phase == PHASE_3_BUILDING) {
                 debugText = "Phase 3";
                 // TODO: NEW METHOD
-                if (heightToDraw < ni.depthHeight()) {
-                    heightToDraw++;
+                if (heightToDraw <= ceiling / 2) {
+                    System.out.println("Max:" + maxUserHeight + " Act: " + heightToDraw);
+                    heightToDraw += 10.0f;
                     forceFaktor++;
+
                 } else {
+                    System.out.println("Max:" + maxUserHeight + " Act: " + heightToDraw);
                     phase = PHASE_4_BEING;
                     mayorMode = MODE_STATIC;
                     pointCloudSteps = 2;
                     drawCount = 0;
                     forceFaktor = 3.0f;
+                    heightToDraw = ceiling;
                 }
                 // ##############################################
                 // OLD METHOD OF BUILDING
@@ -509,6 +527,7 @@ public class Phoenix3D extends PApplet {
         }
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void draw() {
 
@@ -555,7 +574,7 @@ public class Phoenix3D extends PApplet {
         int[] userMap = null;
 
         if (userCount > 0) {
-            // first assume theres no one beside of userCount
+            // first assume there's no one beside of userCount
             userInRoom = false;
             userMap = ni.getUsersPixels(SimpleOpenNI.USERS_ALL);
             userCenters = new PVector[MAX_USERS];
@@ -563,12 +582,11 @@ public class Phoenix3D extends PApplet {
             for (int i = 0; i < MAX_USERS; i++) {
                 userCenters[i] = new PVector();
                 ni.getCoM(i + 1, userCenters[i]);
+
                 if (userCenters[i].x != 0.0 && userCenters[i].y != 0.0 && userCenters[i].z != 0.0) {
                     // when we get a CoM different from 0,0,0 then there truely
                     // is somebody
                     userInRoom = true;
-                    // TODO: in building mode it could look cool to set the
-                    // centers y to heightToDraw
                 }
             }
             // updateComVBO(userCenters);
@@ -634,9 +652,15 @@ public class Phoenix3D extends PApplet {
 
     private void updateComVBO(PVector[] centers) {
         if (centers != null) {
+
             for (int i = 0; i < centers.length; i++) {
                 comBuffer.put(i * 4 + 0, centers[i].x);
-                comBuffer.put(i * 4 + 1, centers[i].y);
+                if (phase == PHASE_3_BUILDING) {
+                    comBuffer.put(i * 4 + 1, heightToDraw);
+
+                } else {
+                    comBuffer.put(i * 4 + 1, centers[i].y);
+                }
                 comBuffer.put(i * 4 + 2, centers[i].z);
                 comBuffer.put(i * 4 + 3, 0);
             }
@@ -664,7 +688,10 @@ public class Phoenix3D extends PApplet {
             for (int i = 0; i < centers.length; i++) {
                 gl.glColor3f(0, 255, 0);
                 gl.glVertex3f(centers[i].x, centers[i].y, centers[i].z);
+                // System.out.println("X:" + centers[i].x + " Y:" + centers[i].y + " Z:" + centers[i].z);
             }
+            gl.glColor3f(255, 0, 0);
+            gl.glVertex3f(0.0f, (float) heightToDraw, (float) backWall / 2);
             gl.glEnd();
             gl.glPointSize(Config.POINTSIZE);
         }
@@ -770,6 +797,8 @@ public class Phoenix3D extends PApplet {
          * TODO: Try building form bottom to top, increase heightToDraw in progressStory starting from floorlevel
          */
         PVector realWorldPoint;
+        // float userHeight = ceiling;
+
         if (userMap != null) {
             gl = pgl.beginGL();
             gl.glEnable(GL.GL_POINTS);
@@ -779,8 +808,9 @@ public class Phoenix3D extends PApplet {
                 int x = i % ni.depthWidth();
                 int y = (i - x) / ni.depthWidth();
                 // TODO:check if point is higher than heightToDraw
-                if ((ni.depthHeight() - y) > heightToDraw) {
-                    break;
+                if (realWorldPoint.y > heightToDraw) {
+                    // System.out.println("Act:" + realWorldPoint.y + " ToDraw:" + heightToDraw);
+                    continue;
                 }
                 // check if there is a user
                 if (userMap[i] != 0) {
@@ -810,6 +840,7 @@ public class Phoenix3D extends PApplet {
                     gl.glColor3f(norm(red(rgbImg.get(x, y)), 0, 255), norm(green(rgbImg.get(x, y)), 0, 255),
                             norm(blue(rgbImg.get(x, y)), 0, 255));
                     gl.glVertex3f(realWorldPoint.x, realWorldPoint.y, realWorldPoint.z);
+                    // userHeight = realWorldPoint.y;
                 }
             }
 
@@ -817,6 +848,7 @@ public class Phoenix3D extends PApplet {
             gl.glDisable(GL.GL_POINTS);
             pgl.endGL();
         }
+        // maxUserHeight = userHeight + 100;
     }
 
     private void paintParticle(int realX, int realY, int particleNumber) {
@@ -1042,8 +1074,8 @@ public class Phoenix3D extends PApplet {
         clMemParticles.read(particleBytes, 0, PARTICLEBYTESIZE, true);
         particleBuffer = particleBytes.asFloatBuffer();
 
-        clMemColors.read(colorBytes, 0, Config.NUM_PARTICLES * 4 * 4, true);
-        colorBuffer = colorBytes.asFloatBuffer();
+        // clMemColors.read(colorBytes, 0, Config.NUM_PARTICLES * 4 * 4, true);
+        // colorBuffer = colorBytes.asFloatBuffer();
 
         openCL.releaseGLObjects();
     }

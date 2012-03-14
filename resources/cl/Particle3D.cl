@@ -289,7 +289,7 @@ __kernel void updateParticle(__global Particle3D* pIn,
 				float tmpY= (comIn[i].y - pin->y);
 				float tmpZ= (comIn[i].z - pin->z);
 				float tmpLen = sqrt(tmpX * tmpX + tmpY * tmpY + tmpZ *tmpZ);
-				if (tmpLen <= 600 && mode == MODE_PLANETARY_BUILD){
+				if (tmpLen <= 100 && mode == MODE_PLANETARY_BUILD){
 					cin->a = 0;
 				}
 				
