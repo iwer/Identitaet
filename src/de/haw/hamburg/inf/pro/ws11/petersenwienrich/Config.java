@@ -2,21 +2,25 @@ package de.haw.hamburg.inf.pro.ws11.petersenwienrich;
 
 public class Config {
     /**
-     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO: EDIT THIS TO SET CORRECT LOCATIONS
-     * WHEN FILES NOT FOUND !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     * TODO: EDIT THIS TO SET CORRECT LOCATIONS WHEN FILES NOT FOUND
+     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
      */
 
-    // private static final String PROJECT_HOME = "C:\\Users\\Umbriel\\workspace\\Phoenix3D\\";
+    private static final String PROJECT_HOME = "C:\\Users\\Umbriel\\workspace\\Phoenix3D\\";
 
-    private static final String PROJECT_HOME = "C:\\Users\\elresidente\\git\\interactive-installations-phoenix3d\\";
+    // private static final String PROJECT_HOME =
+    // "C:\\Users\\elresidente\\git\\interactive-installations-phoenix3d\\";
 
     // private static final String PROJECT_HOME =
     // "/home/elresidente/Develop/Repository/interactive-installations-phoenix3d/";
 
     /* ########################################################### */
 
-    public static final String IMAGES_LOCATION = PROJECT_HOME + "resources\\images\\";
-    // public static final String IMAGES_LOCATION = PROJECT_HOME + "resources/images/";
+    public static final String IMAGES_LOCATION = PROJECT_HOME
+            + "resources\\images\\";
+    // public static final String IMAGES_LOCATION = PROJECT_HOME +
+    // "resources/images/";
 
     /* ########################################################### */
 
@@ -44,7 +48,7 @@ public class Config {
     /* ########################################################### */
     // ParticleConstants
 
-    public final static int NUM_PARTICLES = 1024 * 256;
+    public final static int NUM_PARTICLES = 1024 * 180;
 
     public static final int POINTSIZE = 3;
 
@@ -52,7 +56,7 @@ public class Config {
 
     public static final int TIME_SWARMING = 1000;
 
-    public static final int TIME_BEING = 150;
+    public static final int TIME_BEING = 250;
 
     public static final int TIME_EXPANDING = 60;
 
