@@ -48,20 +48,20 @@ public class Config {
     /* ########################################################### */
     // ParticleConstants
 
-    public final static int NUM_PARTICLES = 1024 * 180;
+    public final static int NUM_PARTICLES = 1024 * 394;
 
     public static final int POINTSIZE = 3;
 
     public static final int TIME_CHAOS = 125;
 
-    public static final int TIME_SWARMING = 1000;
+    public static final int TIME_SWARMING = 600;
 
-    public static final int TIME_BEING = 250;
+    public static final int TIME_BEING = 150;
 
     public static final int TIME_EXPANDING = 60;
 
     public static final int TIME_DESINTEGRATING = 800;
 
-    public static final int TIME_FLOOR = 600;
+    public static final int TIME_FLOOR = 400;
 
 }

@@ -340,6 +340,7 @@ public class Phoenix3D extends PApplet {
             colorBuffer.put(green(particleColor[i]));
             colorBuffer.put(blue(particleColor[i]));
             colorBuffer.put(alpha(particleColor[i]));
+            // colorBuffer.put(0.0f);
         }
 
         particleBuffer.rewind();
@@ -884,9 +885,10 @@ public class Phoenix3D extends PApplet {
                         break;
 
                     }
-                    gl.glColor3f(norm(red(rgbImg.get(x, y)), 0, 255),
+                    gl.glColor4f(norm(red(rgbImg.get(x, y)), 0, 255),
                             norm(green(rgbImg.get(x, y)), 0, 255),
-                            norm(blue(rgbImg.get(x, y)), 0, 255));
+                            norm(blue(rgbImg.get(x, y)), 0, 255),
+                            random(0.0f, 1.0f));
                     gl.glVertex3f(realWorldPoint.x, realWorldPoint.y,
                             realWorldPoint.z);
                     // userHeight = realWorldPoint.y;
