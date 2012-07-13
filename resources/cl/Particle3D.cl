@@ -1,12 +1,15 @@
-
+// to use c syntax highlighting in eclipse
 #ifndef __OPENCL_VERSION__
     #define __kernel
     #define __global
 #endif
 
+
+// constants
 #define GRAVITY -0.981f
 #define DELTATIME 2.0f
 
+// modes
 #define MODE_STATIC 0
 #define MODE_GRAVITY 1
 #define MODE_WEIGHTLESS 2
@@ -15,7 +18,7 @@
 #define MODE_PLANETARY 5
 #define MODE_PLANETARY_BUILD 6
 
-
+// particle structure
 typedef struct{
     float x;
     float y;
@@ -27,6 +30,7 @@ typedef struct{
     float dummy2;
 } Particle3D;
 
+// particle color structure
 typedef struct {
 	float r;
 	float g;
@@ -34,6 +38,7 @@ typedef struct {
 	float a; 
 } Color;
 
+// center of mass structure
 typedef struct {
     float x;
     float y;
@@ -51,8 +56,10 @@ __kernel void updateParticle(__global Particle3D* pIn,
                              float backWall, 
                              int mode,
                              float forceFactor) {
+    
     // Global work-item ID value
     int id = get_global_id(0);
+    
     // Particle at index id
     __global Particle3D *pin = &pIn[id];
     __global Color *cin = &cIn[id];
@@ -64,13 +71,13 @@ __kernel void updateParticle(__global Particle3D* pIn,
     if(mode == MODE_STATIC) {
         for(int i = 0; i < 10; i++){
                     if(comIn[i].x != 0 && comIn[i].y != 0 && comIn[i].z != 0){
-                        float tmpX= (comIn[i].x - pin->x);
-                        float tmpY= (comIn[i].y - pin->y);
-                        float tmpZ= (comIn[i].z - pin->z);
+                        float tmpX = (comIn[i].x - pin->x);
+                        float tmpY = (comIn[i].y - pin->y);
+                        float tmpZ = (comIn[i].z - pin->z);
                         float tmpLen = sqrt(tmpX * tmpX + tmpY * tmpY + tmpZ *tmpZ);
-                        if (tmpLen <= 400 && mode == MODE_PLANETARY_BUILD){
-                            cin->a = 0;
-                        }
+                        //if (tmpLen <= 400 && mode == MODE_PLANETARY_BUILD){
+                        //    cin->a = 0;
+                        //}
                     }
         }
         
@@ -111,6 +118,7 @@ __kernel void updateParticle(__global Particle3D* pIn,
 
         // velocity change
         pin->velY = pin->velY + diffSpeedY;
+        
     //###########################################################
     // GRAVITY MODE
     } else if(mode == MODE_GRAVITY) {
@@ -285,18 +293,18 @@ __kernel void updateParticle(__global Particle3D* pIn,
         // pull to gravitation centers
         for(int i = 0; i < 10; i++){
             if(comIn[i].x != 0 && comIn[i].y != 0 && comIn[i].z != 0){
-				float tmpX= (comIn[i].x - pin->x);
-				float tmpY= (comIn[i].y - pin->y);
-				float tmpZ= (comIn[i].z - pin->z);
-				float tmpLen = sqrt(tmpX * tmpX + tmpY * tmpY + tmpZ *tmpZ);
-				if (tmpLen <= 200 && mode == MODE_PLANETARY_BUILD){
-					cin->a = 0;
-				}
-				
-				// * 1/r^2
-				dirVectX += tmpX * (1 / (tmpLen * tmpLen));
-				dirVectY += tmpY * (1 / (tmpLen * tmpLen));
-				dirVectZ += tmpZ * (1 / (tmpLen * tmpLen));
+                float tmpX= (comIn[i].x - pin->x);
+                float tmpY= (comIn[i].y - pin->y);
+                float tmpZ= (comIn[i].z - pin->z);
+                float tmpLen = sqrt(tmpX * tmpX + tmpY * tmpY + tmpZ *tmpZ);
+                if (tmpLen <= 200 && mode == MODE_PLANETARY_BUILD){
+                    cin->a = 0;
+                }
+                
+                // * 1/r^2
+                dirVectX += tmpX * (1 / (tmpLen * tmpLen));
+                dirVectY += tmpY * (1 / (tmpLen * tmpLen));
+                dirVectZ += tmpZ * (1 / (tmpLen * tmpLen));
             }
         }
         
@@ -334,8 +342,4 @@ __kernel void updateParticle(__global Particle3D* pIn,
         pin->y = (pin->y) + pin->velY;
         pin->z = (pin->z) + pin->velZ;
     }
-    
-    
-    
-    
 }
