@@ -1,5 +1,4 @@
-package de.haw.hamburg.inf.pro.ws11.petersenwienrich;
-
+package Identitaet;
 //mail@laurastolte.de -> screenshot 300dpi
 import static javax.media.opengl.GL.GL_ARRAY_BUFFER_ARB;
 import static javax.media.opengl.GL.GL_DYNAMIC_COPY_ARB;
@@ -23,7 +22,7 @@ import SimpleOpenNI.SimpleOpenNI;
 
 import com.nativelibs4java.opencl.CLMem;
 
-public class Phoenix3D extends PApplet {
+public class Identitaet extends PApplet {
 
     private static final long serialVersionUID = 1L;
 
@@ -100,7 +99,7 @@ public class Phoenix3D extends PApplet {
     // the x-axis,
     // the data from openni comes upside down
     private float camRotY = radians(0);
-    private float camRotTick;
+    //private float camRotTick;
 
     // Moved Particle Counter
     private int tmpParticleNumber;
@@ -140,7 +139,7 @@ public class Phoenix3D extends PApplet {
 
     static public void main(String args[]) {
         PApplet.main(new String[] { "--present", "--bgcolor=#000000", "--present-stop-color=#000000",
-                "de.haw.hamburg.inf.pro.ws11.petersenwienrich.Phoenix3D" });
+                "Identitaet.Identitaet" });
     }
 
     @Override
@@ -597,7 +596,7 @@ public class Phoenix3D extends PApplet {
 
         }
 
-        updateComVBO(userCenters);
+        updateCenterOfMassVBO(userCenters);
 
         Update();
         Render();
@@ -612,7 +611,7 @@ public class Phoenix3D extends PApplet {
         // System.out.println("FPS:" + fpsCounter.getFrequency());
     }
 
-    private void updateComVBO(PVector[] centers) {
+    private void updateCenterOfMassVBO(PVector[] centers) {
         if (centers != null) {
             for (int i = 0; i < centers.length; i++) {
                 comBuffer.put(i * 4 + 0, centers[i].x);

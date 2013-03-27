@@ -1,4 +1,4 @@
-package de.haw.hamburg.inf.pro.ws11.petersenwienrich;
+package Identitaet;
 
 public class Config {
     /**
