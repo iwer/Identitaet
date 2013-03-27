@@ -1,6 +1,4 @@
-Identitaet
-
-==========================================================================================
+# Identitaet
 
 We form the silhouette of the visitor from thousands of particles. This project uses
 
@@ -13,12 +11,12 @@ Follow the instructions at http://code.google.com/p/simple-openni/wiki/Installat
 
 Be sure to have
 
-    SimpleOpenNI.jar
-    msaopencl.jar, javacl-1.0-beta-5-shaded.jar
-    from processing:
-        ./lib/core.jar
-        ./modes/java/libraries/opengl/gluegen-rt.jar
-        ./modes/java/libraries/opengl/jogl.jar
-        ./modes/java/libraries/opengl/opengl.jar 
+* SimpleOpenNI.jar
+* msaopencl.jar, javacl-1.0-beta-5-shaded.jar
+* from processing:
+    * ./lib/core.jar
+    * ./modes/java/libraries/opengl/gluegen-rt.jar
+    * ./modes/java/libraries/opengl/jogl.jar
+    * ./modes/java/libraries/opengl/opengl.jar 
 
 in your buildpath. Don't forget to include the required native libraries for SimpleOpenNi gluegen and jogl. 
