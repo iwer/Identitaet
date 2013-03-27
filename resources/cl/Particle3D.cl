@@ -1,4 +1,5 @@
-
+// With this defines, Eclipse can format this file as c code
+// The opencl compiler ignores them, due defining __OPENCL_VERSION__
 #ifndef __OPENCL_VERSION__
     #define __kernel
     #define __global

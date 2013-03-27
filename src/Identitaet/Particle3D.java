@@ -7,8 +7,8 @@ public class Particle3D {
     public float velX;
     public float velY;
     public float velZ;
-    public float dummy1;
-    public float dummy2;
+    public float dummy1; // for alignment
+    public float dummy2; // for alignment
 
     public Particle3D(float x, float y, float z, float velX, float velY, float velZ) {
         this.x = x;

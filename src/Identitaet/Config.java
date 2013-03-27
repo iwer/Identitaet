@@ -8,8 +8,8 @@ public class Config {
      */
 
     // private static final String PROJECT_HOME =
-    // "C:\\Users\\Umbriel\\workspace\\Phoenix3D\\";
-    private static final String PROJECT_HOME = "/home/elresidente/Develop/Repository/interactive-installations-phoenix3d/";
+    // "C:\\Users\\Umbriel\\workspace\\Identitaet\\";
+    private static final String PROJECT_HOME = "/home/elresidente/Develop/Repository/Identitaet/";
 
     /* ########################################################### */
 
