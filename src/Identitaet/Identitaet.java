@@ -1,5 +1,6 @@
 package Identitaet;
 //mail@laurastolte.de -> screenshot 300dpi
+
 import static javax.media.opengl.GL.GL_ARRAY_BUFFER_ARB;
 import static javax.media.opengl.GL.GL_DYNAMIC_COPY_ARB;
 
@@ -26,6 +27,7 @@ public class Identitaet extends PApplet {
 
     private static final long serialVersionUID = 1L;
 
+    // Particle Size Constants
     private final int PARTICLE_NFLOAT = 8;
     private final int PARTICLEFLOATSIZE = Config.NUM_PARTICLES * PARTICLE_NFLOAT;
     private final int PARTICLEBYTESIZE = PARTICLEFLOATSIZE * 4;
@@ -42,11 +44,12 @@ public class Identitaet extends PApplet {
 
     private int mayorMode = MODE_GRAVITY;
 
+    // Gravity modes
     private static final int GRAVITY_FALLING = 102;
     private static final int GRAVITY_EXPLODE = 103;
     private int gravityMode = GRAVITY_FALLING;
 
-    // phasen
+    // Story phases
     private static final int PHASE_0_START = 1001;
     private static final int PHASE_1_CHAOS = 1002;
     private static final int PHASE_2_SWARMING = 1003;
@@ -95,11 +98,9 @@ public class Identitaet extends PApplet {
     private SimpleOpenNI ni;
     private float camZoomF = 0.24f;
     private float camRotX = radians(180) - 0.0f; // by default rotate the whole
-                                                 // scene 180deg around
-    // the x-axis,
-    // the data from openni comes upside down
+                                                 // scene 180deg around the x-axis,
+                                                 // the data from openni comes upside down
     private float camRotY = radians(0);
-    //private float camRotTick;
 
     // Moved Particle Counter
     private int tmpParticleNumber;
@@ -107,7 +108,7 @@ public class Identitaet extends PApplet {
     // draw counter
     private int drawCount;
 
-    // for the user colors
+    // Room Textures
     private PImage rgbImg;
     private PImage backgroundImg;
     private PImage floorImg;
@@ -118,25 +119,41 @@ public class Identitaet extends PApplet {
     // stopwatch
     long timestamp;
 
+    // Room wall positions
     private float floorLevel;
     private float leftWall;
     private float rightWall;
     private float backWall;
     private float ceiling;
 
+    // counter for moving backwards
     private int moveBackCounter;
 
+    // texture IDs
     private final int[] texture = new int[5];
 
+    // gravity multiplikator
     private float forceFaktor = 3.0f;
 
+    // indicates that a user is in the cams view
     private boolean userInRoom;
 
+    // step width for iterating over points
     private int pointCloudSteps = 2;
+
+    // repeat count variable
     private int howOften = 0;
 
+    // height of user for building
+    private float heightToDraw;
+
+    // Debug Text for on screen displaying
     String debugText = "";
 
+    // maximum height of user
+    private float maxUserHeight;
+
+    // main function to let applet run fullscreen
     static public void main(String args[]) {
         PApplet.main(new String[] { "--present", "--bgcolor=#000000", "--present-stop-color=#000000",
                 "Identitaet.Identitaet" });
@@ -144,7 +161,6 @@ public class Identitaet extends PApplet {
 
     @Override
     public void setup() {
-
         // SimpleOpenNI Setup
         timestamp = millis();
         ni = new SimpleOpenNI(this, SimpleOpenNI.RUN_MODE_MULTI_THREADED);
@@ -160,21 +176,33 @@ public class Identitaet extends PApplet {
         timestamp = millis();
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         size(screen.width, screen.height, OPENGL);
-        frameRate(30);
+        frameRate(25);
         timestamp = millis() - timestamp;
         System.out.println("Processing Setup time: " + timestamp + " ms");
 
-        floorLevel = -(height + 500);
-        ceiling = height + 500;
+        // set room dimensions
+        floorLevel = -(height);
+        ceiling = height + 200;
         leftWall = -3000;
         rightWall = 3000;
         backWall = 6000;
+        heightToDraw = floorLevel + 0.5f;
+        maxUserHeight = floorLevel + 0.5f;
 
-        backgroundImg = loadImage(IMG_RESSOURCE + "room1_backwall.jpg");
-        floorImg = loadImage(IMG_RESSOURCE + "room1_floor.jpg");
-        lWallImg = loadImage(IMG_RESSOURCE + "room1_left_wall.jpg");
-        rWallImg = loadImage(IMG_RESSOURCE + "room1_right_wall.jpg");
-        ceilImg = loadImage(IMG_RESSOURCE + "room1_ceiling.jpg");
+        // load texture images
+        if (Config.ROOM_MODE == Config.ROOM_SHABY) {
+            backgroundImg = loadImage(IMG_RESSOURCE + "room1_backwall.jpg");
+            floorImg = loadImage(IMG_RESSOURCE + "room1_floor.jpg");
+            lWallImg = loadImage(IMG_RESSOURCE + "room1_left_wall.jpg");
+            rWallImg = loadImage(IMG_RESSOURCE + "room1_right_wall.jpg");
+            ceilImg = loadImage(IMG_RESSOURCE + "room1_ceiling.jpg");
+        } else if (Config.ROOM_MODE == Config.ROOM_WHITE) {
+            backgroundImg = loadImage(IMG_RESSOURCE + "white_back.jpg");
+            floorImg = loadImage(IMG_RESSOURCE + "white_floor.jpg");
+            lWallImg = loadImage(IMG_RESSOURCE + "white_left.jpg");
+            rWallImg = loadImage(IMG_RESSOURCE + "white_right.jpg");
+            ceilImg = loadImage(IMG_RESSOURCE + "white_ceiling.jpg");
+        }
 
         // initialize GL object
         timestamp = millis();
@@ -187,14 +215,15 @@ public class Identitaet extends PApplet {
         gl.glEnable(GL.GL_BLEND);
         gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE);
 
+        // generate openGL Textures
         gl.glGenTextures(5, texture, 0);
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture[0]);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
-        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, backgroundImg.width, backgroundImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
-                IntBuffer.wrap(backgroundImg.pixels));
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, backgroundImg.width, backgroundImg.height, 0, GL.GL_BGRA,
+                GL.GL_UNSIGNED_BYTE, IntBuffer.wrap(backgroundImg.pixels));
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
         // #####
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture[1]);
@@ -202,8 +231,8 @@ public class Identitaet extends PApplet {
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
-        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, floorImg.width, floorImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
-                IntBuffer.wrap(floorImg.pixels));
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, floorImg.width, floorImg.height, 0, GL.GL_BGRA,
+                GL.GL_UNSIGNED_BYTE, IntBuffer.wrap(floorImg.pixels));
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
         // #####
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture[2]);
@@ -211,8 +240,8 @@ public class Identitaet extends PApplet {
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
-        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, lWallImg.width, lWallImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
-                IntBuffer.wrap(lWallImg.pixels));
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, lWallImg.width, lWallImg.height, 0, GL.GL_BGRA,
+                GL.GL_UNSIGNED_BYTE, IntBuffer.wrap(lWallImg.pixels));
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
         // #####
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture[3]);
@@ -220,8 +249,8 @@ public class Identitaet extends PApplet {
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
-        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, rWallImg.width, rWallImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
-                IntBuffer.wrap(rWallImg.pixels));
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, rWallImg.width, rWallImg.height, 0, GL.GL_BGRA,
+                GL.GL_UNSIGNED_BYTE, IntBuffer.wrap(rWallImg.pixels));
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
         // #####
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture[4]);
@@ -229,8 +258,8 @@ public class Identitaet extends PApplet {
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
-        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, ceilImg.width, ceilImg.height, 0, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE,
-                IntBuffer.wrap(ceilImg.pixels));
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, ceilImg.width, ceilImg.height, 0, GL.GL_BGRA,
+                GL.GL_UNSIGNED_BYTE, IntBuffer.wrap(ceilImg.pixels));
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
 
         timestamp = millis() - timestamp;
@@ -268,10 +297,10 @@ public class Identitaet extends PApplet {
         timestamp = millis();
 
         int initialParticleColor = 0;
-
+        // set initial particle color
         switch (Config.COLOR_MODE) {
         case Config.COLOR_FULL:
-            initialParticleColor = 255;
+            initialParticleColor = 0;
             break;
         case Config.COLOR_WHITE_ON_BLACK:
             initialParticleColor = 255;
@@ -290,8 +319,9 @@ public class Identitaet extends PApplet {
             break;
         }
 
+        // generate particles
         for (int i = 0; i < Config.NUM_PARTICLES; i++) {
-            particle[i] = new Particle3D(random(leftWall, rightWall), random(floorLevel, ceiling), random(0, backWall), 0, 0, 0);
+            particle[i] = new Particle3D(0, floorLevel, backWall / 2, 0, 0, 0);
             particleBuffer.put(particle[i].x);
             particleBuffer.put(particle[i].y);
             particleBuffer.put(particle[i].z);
@@ -303,6 +333,7 @@ public class Identitaet extends PApplet {
             colorBuffer.put(green(particleColor[i]));
             colorBuffer.put(blue(particleColor[i]));
             colorBuffer.put(alpha(particleColor[i]));
+            // colorBuffer.put(0.0f);
         }
 
         particleBuffer.rewind();
@@ -311,6 +342,8 @@ public class Identitaet extends PApplet {
         System.out.println("OpenCL Buffer Fill time: " + timestamp + " ms");
 
         timestamp = millis();
+
+        // prepare virtual buffer objects
         VBOParticleBuffer = new int[1];
         // This does nothing more than create a handle (like a link) to a
         // buffer.
@@ -334,16 +367,19 @@ public class Identitaet extends PApplet {
         timestamp = millis() - timestamp;
         System.out.println("OpenCL VBO Setup time: " + timestamp + " ms");
 
+        // create CL Objects from openGL VBOs
         clMemParticles = openCL.createBufferFromGLObject(VBOParticleBuffer[0], CLMem.Usage.InputOutput);
         clMemColors = openCL.createBufferFromGLObject(VBOColorBuffer[0], CLMem.Usage.InputOutput);
 
         clMemCom = new OpenCLBuffer();
         clMemCom.initBuffer(MAX_USERS * 4 * OpenCL.SIZEOF_FLOAT, CLMem.Usage.InputOutput, comBuffer);
 
+        // load openCL program
         System.out.println("Load particle program");
         openCL.loadProgramFromFile(dataPath(CL_RESSOURCE + "Particle3D.cl"));
         clKernel = openCL.loadKernel("updateParticle");
 
+        // set arguments
         clKernel.setArg(0, clMemParticles.getCLMem());
         clKernel.setArg(1, clMemColors.getCLMem());
         clKernel.setArg(2, clMemCom.getCLMem());
@@ -361,10 +397,7 @@ public class Identitaet extends PApplet {
 
     }
 
-    private void updateMayorMode() {
-        progressStory();
-    }
-
+    /** story progress engine set new phase and mode depending of a set of variables */
     private void progressStory() {
         if (!userInRoom) {
             phase = PHASE_0_START;
@@ -397,35 +430,28 @@ public class Identitaet extends PApplet {
                 if (moveBackCounter >= Config.TIME_SWARMING) {
                     mayorMode = MODE_PLANETARY_BUILD;
                     phase = PHASE_3_BUILDING;
-                    pointCloudSteps = 200;
+                    pointCloudSteps = 2;
                     moveBackCounter = 0;
                     drawCount = 1;
+                    heightToDraw = floorLevel + 0.5f;
+                    maxUserHeight = floorLevel + 20.5f;
                 } else {
                     moveBackCounter++;
                 }
             } else if (phase == PHASE_3_BUILDING) {
                 debugText = "Phase 3";
-                if (pointCloudSteps > 500) {
-                    pointCloudSteps -= 20;
+                if (heightToDraw <= ceiling / 2) {
+                    heightToDraw += 10.0f;
                     forceFaktor++;
-                } else if (pointCloudSteps > 200) {
-                    pointCloudSteps -= 10;
-                    forceFaktor++;
-                } else if (pointCloudSteps > 100) {
-                    pointCloudSteps -= 5;
-                    forceFaktor++;
-                } else if (pointCloudSteps > 50) {
-                    pointCloudSteps -= 2;
-                    forceFaktor++;
-                } else if (pointCloudSteps > 2) {
-                    pointCloudSteps--;
-                    forceFaktor++;
-                } else if (pointCloudSteps <= 2) {
+
+                } else {
+                    System.out.println("Max:" + maxUserHeight + " Act: " + heightToDraw);
                     phase = PHASE_4_BEING;
                     mayorMode = MODE_STATIC;
-                    pointCloudSteps = 1;
+                    pointCloudSteps = 2;
                     drawCount = 0;
                     forceFaktor = 3.0f;
+                    heightToDraw = ceiling;
                 }
             } else if (phase == PHASE_4_BEING) {
                 debugText = "Phase 4";
@@ -441,11 +467,7 @@ public class Identitaet extends PApplet {
             } else if (phase == PHASE_5_DESINTEGRATING) {
                 debugText = "Phase 5";
                 if (mayorMode == MODE_WEIGHTLESS && moveBackCounter >= Config.TIME_EXPANDING) {
-                    // mayorMode = MODE_NEG_WEIGHTLESS;
-                    // moveBackCounter = 0;
                     drawCount = 1;
-                    // } else if (mayorMode == MODE_NEG_WEIGHTLESS
-                    // && moveBackCounter >= Config.TIME_EXPANDING * 0.5) {
                     mayorMode = MODE_GRAVITY;
                     gravityMode = GRAVITY_FALLING;
                     howOften = 1000;
@@ -488,12 +510,13 @@ public class Identitaet extends PApplet {
         }
     }
 
-    @Override
     public void draw() {
-
+        // get GL context
         PGraphicsOpenGL pgl = (PGraphicsOpenGL) g;
+        // Update SimpleOpenNi
         ni.update();
 
+        // set background
         switch (Config.COLOR_MODE) {
         case Config.COLOR_FULL:
             background(0);
@@ -515,26 +538,29 @@ public class Identitaet extends PApplet {
             break;
         }
 
+        // FPS Counter update
         fpsCounter.triggerCount();
 
         // set the cam position
-        translate(width / 2, height / 2, 0);
+        translate(width / 2, height / 2, 100.0f);
         rotateX(camRotX);
         rotateY(camRotY);
         scale(camZoomF);
 
+        // get new rgb image
         rgbImg = ni.rgbImage();
 
-        // pointCloudSteps = 2;
+        // get user count
         int userCount = ni.getNumberOfUsers();
         if (userCount > MAX_USERS) {
             userCount = MAX_USERS;
         }
 
+        // delete old user map
         int[] userMap = null;
 
         if (userCount > 0) {
-            // first assume theres no one beside of userCount
+            // first assume there's no one beside of userCount
             userInRoom = false;
             userMap = ni.getUsersPixels(SimpleOpenNI.USERS_ALL);
             userCenters = new PVector[MAX_USERS];
@@ -546,18 +572,15 @@ public class Identitaet extends PApplet {
                     // when we get a CoM different from 0,0,0 then there truely
                     // is somebody
                     userInRoom = true;
-                    // TODO: in building mode it could look cool to set the
-                    // centers y to heightToDraw
                 }
             }
-            // updateComVBO(userCenters);
 
-            updateMayorMode();
+            progressStory();
+            // draw depending on actual mode
             if (mayorMode == MODE_STATIC) {
                 if (Config.COLOR_MODE == Config.COLOR_FULL || Config.COLOR_MODE == Config.COLOR_DUST) {
                     drawBackground();
                 }
-                // putAllParticlesToGround();
                 drawStaticPoints(pgl, pointCloudSteps, userMap);
             } else if (mayorMode == MODE_GRAVITY) {
                 if (Config.COLOR_MODE == Config.COLOR_FULL || Config.COLOR_MODE == Config.COLOR_DUST) {
@@ -566,9 +589,9 @@ public class Identitaet extends PApplet {
                 if (phase == PHASE_5_DESINTEGRATING) {
                     drawStaticPoints(pgl, 2, userMap);
                 }
-                createFreeMovingParticles(pointCloudSteps, userMap, howOften);
+                makeParticlesFreeMoving(pointCloudSteps, userMap, howOften);
             } else if (mayorMode == MODE_WEIGHTLESS || mayorMode == MODE_NEG_WEIGHTLESS) {
-                createFreeMovingParticles(pointCloudSteps, userMap, howOften);
+                makeParticlesFreeMoving(pointCloudSteps, userMap, howOften);
                 if (Config.COLOR_MODE == Config.COLOR_FULL || Config.COLOR_MODE == Config.COLOR_DUST) {
                     drawBackground();
                 }
@@ -601,6 +624,7 @@ public class Identitaet extends PApplet {
         Update();
         Render();
 
+        // ///Debug Stuff
         // drawCenterOfMass(userCenters);
         // PFont metaBold = createFont("FFScala", 88);
         //
@@ -615,7 +639,12 @@ public class Identitaet extends PApplet {
         if (centers != null) {
             for (int i = 0; i < centers.length; i++) {
                 comBuffer.put(i * 4 + 0, centers[i].x);
-                comBuffer.put(i * 4 + 1, centers[i].y);
+                if (phase == PHASE_3_BUILDING) {
+                    comBuffer.put(i * 4 + 1, heightToDraw);
+
+                } else {
+                    comBuffer.put(i * 4 + 1, centers[i].y);
+                }
                 comBuffer.put(i * 4 + 2, centers[i].z);
                 comBuffer.put(i * 4 + 3, 0);
             }
@@ -635,6 +664,7 @@ public class Identitaet extends PApplet {
         }
     }
 
+    /** draw mass centers */
     private void drawCenterOfMass(PVector[] centers) {
         if (centers != null) {
             gl = pgl.beginGL();
@@ -643,16 +673,19 @@ public class Identitaet extends PApplet {
             for (int i = 0; i < centers.length; i++) {
                 gl.glColor3f(0, 255, 0);
                 gl.glVertex3f(centers[i].x, centers[i].y, centers[i].z);
+                // System.out.println("X:" + centers[i].x + " Y:" + centers[i].y
+                // + " Z:" + centers[i].z);
             }
+            gl.glColor3f(255, 0, 0);
+            gl.glVertex3f(0.0f, (float) heightToDraw, (float) backWall / 2);
             gl.glEnd();
             gl.glPointSize(Config.POINTSIZE);
         }
     }
 
+    /** gives every particle a random spherical direction */
     private void makeAllParticlesRandom() {
-
         if (drawCount < 1) {
-
             for (int i = 0; i < Config.NUM_PARTICLES; i++) {
                 if (tmpParticleNumber >= Config.NUM_PARTICLES) {
                     tmpParticleNumber = 0;
@@ -671,6 +704,7 @@ public class Identitaet extends PApplet {
         }
     }
 
+    /** puts all particles to ground with no movement */
     private void putAllParticlesToGround() {
         if (drawCount <= 0) {
             for (int i = 0; i < Config.NUM_PARTICLES; i++) {
@@ -689,7 +723,8 @@ public class Identitaet extends PApplet {
         }
     }
 
-    private void createFreeMovingParticles(int pointCloudSteps, int[] userMap, int howOften) {
+    /** gives every particle a random direction */
+    private void makeParticlesFreeMoving(int pointCloudSteps, int[] userMap, int howOften) {
         PVector realWorldPoint;
         if (userMap != null) {
             if (drawCount < howOften) {
@@ -699,8 +734,8 @@ public class Identitaet extends PApplet {
                     int y = (i - x) / ni.depthWidth();
                     // check if there is a user
                     if (userMap[i] != 0) {
-                        createGravityParticle(realWorldPoint.x + random(-2, 2), realWorldPoint.y + random(-2, 2), realWorldPoint.z
-                                + random(-2, 2), x, y);
+                        setGravityParticle(realWorldPoint.x + random(-2, 2), realWorldPoint.y + random(-2, 2),
+                                realWorldPoint.z + random(-2, 2), x, y);
                     }
                 }
             }
@@ -708,15 +743,17 @@ public class Identitaet extends PApplet {
         }
     }
 
-    public void createGravityParticle(float x, float y, float z, int realX, int realY) {
+    /** gives new values to next particle */
+    public void setGravityParticle(float x, float y, float z, int realX, int realY) {
         if (tmpParticleNumber >= Config.NUM_PARTICLES) {
             tmpParticleNumber = 0;
         }
-        createGravityParticle(x, y, z, realX, realY, tmpParticleNumber);
+        setGravityParticle(x, y, z, realX, realY, tmpParticleNumber);
         tmpParticleNumber++;
     }
 
-    public void createGravityParticle(float x, float y, float z, int realX, int realY, int particleNumber) {
+    /** gives new values to particle particleNumber */
+    public void setGravityParticle(float x, float y, float z, int realX, int realY, int particleNumber) {
         if (z <= 10) {
             return;
         }
@@ -744,12 +781,10 @@ public class Identitaet extends PApplet {
         paintParticle(realX, realY, particleNumber);
     }
 
+    /** directly draw user mask points */
     private void drawStaticPoints(PGraphicsOpenGL pgl, int pointCloudSteps, int[] userMap) {
-        /*
-         * TODO: Try building form bottom to top, increase heightToDraw in
-         * progressStory starting from floorlevel
-         */
         PVector realWorldPoint;
+
         if (userMap != null) {
             gl = pgl.beginGL();
             gl.glEnable(GL.GL_POINTS);
@@ -759,9 +794,11 @@ public class Identitaet extends PApplet {
                 int x = i % ni.depthWidth();
                 int y = (i - x) / ni.depthWidth();
                 // check if point is higher than heightToDraw
-                // if (y > heightToDraw) {
-                // break;
-                // }
+                if (realWorldPoint.y > heightToDraw) {
+                    // System.out.println("Act:" + realWorldPoint.y + " ToDraw:"
+                    // + heightToDraw);
+                    continue;
+                }
                 // check if there is a user
                 if (userMap[i] != 0) {
                     switch (Config.COLOR_MODE) {
@@ -787,8 +824,8 @@ public class Identitaet extends PApplet {
                         break;
 
                     }
-                    gl.glColor3f(norm(red(rgbImg.get(x, y)), 0, 255), norm(green(rgbImg.get(x, y)), 0, 255),
-                            norm(blue(rgbImg.get(x, y)), 0, 255));
+                    gl.glColor4f(norm(red(rgbImg.get(x, y)), 0, 255), norm(green(rgbImg.get(x, y)), 0, 255),
+                            norm(blue(rgbImg.get(x, y)), 0, 255), random(0.0f, 1.0f));
                     gl.glVertex3f(realWorldPoint.x, realWorldPoint.y, realWorldPoint.z);
                 }
             }
@@ -799,6 +836,7 @@ public class Identitaet extends PApplet {
         }
     }
 
+    /** give rgbimage color to specific particle */
     private void paintParticle(int realX, int realY, int particleNumber) {
         switch (Config.COLOR_MODE) {
         case Config.COLOR_FULL:
@@ -823,6 +861,7 @@ public class Identitaet extends PApplet {
 
     }
 
+    /** give specific color to specific particle */
     private void paintParticle(int color, int particleNumber) {
         particleColor[particleNumber] = color;
 
@@ -990,6 +1029,7 @@ public class Identitaet extends PApplet {
 
     }
 
+    /** Update openCL Objects */
     void Update() {
 
         openCL.acquireGLObjects();
@@ -1022,8 +1062,8 @@ public class Identitaet extends PApplet {
         clMemParticles.read(particleBytes, 0, PARTICLEBYTESIZE, true);
         particleBuffer = particleBytes.asFloatBuffer();
 
-        clMemColors.read(colorBytes, 0, Config.NUM_PARTICLES * 4 * 4, true);
-        colorBuffer = colorBytes.asFloatBuffer();
+        // clMemColors.read(colorBytes, 0, Config.NUM_PARTICLES * 4 * 4, true);
+        // colorBuffer = colorBytes.asFloatBuffer();
 
         openCL.releaseGLObjects();
     }
