@@ -1,6 +1,10 @@
 # Identitaet
 
-We form the silhouette of the visitor from thousands of particles. This project uses
+We form the silhouette of the visitor from thousands of particles. 
+
+Video: http://vimeo.com/42352184
+
+This project uses
 
 * Java
 * Processing http://processing.org
